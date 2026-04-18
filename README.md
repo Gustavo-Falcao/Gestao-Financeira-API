@@ -1,15 +1,6 @@
 # Gestão Financeira API
 
-## Entidades do projeto
+## Modelagem inicial do projeto
 
-### Usuario
-![Entidade Usuario](docs/usuario-entidade.png "Entidade usuario")
+![Entidade Usuario](docs/modelagem-inicial.png "Entidade usuario")
 
-### Conta
-![Entidade Conta](docs/conta-entidade.png "Entidade conta")
-
-### Categoria
-![Entidade Categoria](docs/categoria-entidade.png "Entidade categoria")
-
-### Transacao
-![Transacao Categoria](docs/transacao-entidade.png "Transacao categoria")
