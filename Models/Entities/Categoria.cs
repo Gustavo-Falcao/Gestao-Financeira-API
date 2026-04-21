@@ -1,12 +1,32 @@
-using GestaoFinanceira.Models.Enuns;
+using Gestao_Financeira.Models.Enuns;
 
-namespace GestaoFinanceira.Models.Entities
+namespace Gestao_Financeira.Models.Entities
 {
     public class Categoria (string nome, TipoMovimentacao tipoMovimentacao, string usuarioId)
     {
-        private string? Id { get; set; } = Guid.NewGuid().ToString("N");
-        private string? Nome { get; set; } = nome;
-        private TipoMovimentacao TipoMovimentacao { get; set; } = tipoMovimentacao;
-        private string? UsuarioId { get; set; } = usuarioId;
-    }
+        public string? Id { get; private set; } = Guid.NewGuid().ToString("N");
+        public string? Nome { get; private set; } = nome;
+        public TipoMovimentacao TipoMovimentacao { get; private set; } = tipoMovimentacao;
+        public string? UsuarioId { get; private set; } = usuarioId;
+
+        public void AlterarId(string novoId)
+        {
+            Id = novoId;
+        }
+
+        public void AlterarNome(string novoNome)
+        {
+            Nome = novoNome;
+        }
+
+        public void AlterarTipoMovimentacao(TipoMovimentacao novoTipoMovimentacao)
+        {
+            TipoMovimentacao = novoTipoMovimentacao;
+        }
+
+        public void AlterarUsuarioId(string novoUsuarioId)
+        {
+            UsuarioId = novoUsuarioId;
+        }
+     }
 }
