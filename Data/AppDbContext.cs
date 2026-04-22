@@ -1,18 +1,16 @@
-using GestaoFinanceira.Models.Entities;
 using Microsoft.EntityFrameworkCore;
+using Gestao_Financeira.Models.Entities;
 
-namespace GestaoFinanceira.Data
+namespace Gestao_Financeira.Data
 {
-    class AppDbContext : DbContext
+    public class AppDbContext : DbContext
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-        {
-            
-        }
-
         public DbSet<User> Users { get; set; }
-        public DbSet<Conta> Contas { get; set; }
         public DbSet<Categoria> Categorias { get; set; }
+        public DbSet<Conta> Contas { get; set; }
         public DbSet<Transacao> Transacoes { get; set; }
+        
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options){ }
+
     }
 }

@@ -1,13 +1,39 @@
-using GestaoFinanceira.Models.Enuns;
+using Gestao_Financeira.Models.Enuns;
 
-namespace GestaoFinanceira.Models.Entities
+namespace Gestao_Financeira.Models.Entities
 {
     public class Conta (string nome, TipoConta tipoConta, decimal saldoInicial, string usuarioId)
     {
-        private string Id { get; set; } = Guid.NewGuid().ToString("N");
-        private string? Nome { get; set; } = nome;
-        private TipoConta TipoConta { get; set; } = tipoConta;
-        private decimal SaldoInicial { get; set; } = saldoInicial;
-        private string? UsuarioId { get; set; } = usuarioId;
+        public string Id { get; private set; } = Guid.NewGuid().ToString("N");
+        public string? Nome { get; private set; } = nome;
+        public TipoConta TipoConta { get; private set; } = tipoConta;
+        public decimal SaldoInicial { get; private set; } = saldoInicial;
+        public string? UsuarioId { get; private set; } = usuarioId;
+        
+        public void AlterarId(string novoId)
+        {
+            Id = novoId;    
+        }
+
+        public void AlterarNome(string novoNome)
+        {
+            Nome = novoNome;
+        }
+
+        public void AlterarTipoConta(TipoConta novoTipoConta)
+        {
+            TipoConta = novoTipoConta;
+        }
+
+        public void AlterarSaldoInicial(decimal novoSaldoInicial)
+        {
+            SaldoInicial = novoSaldoInicial;
+        }
+
+        public void AlterarUsuarioId(string novoUsuarioId)
+        {
+            UsuarioId = novoUsuarioId;
+        }
     }
+
 }

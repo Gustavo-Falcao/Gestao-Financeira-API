@@ -1,4 +1,5 @@
-using GestaoFinanceira.Data;
+using Gestao_Financeira.Data;
+using Gestao_Financeira.Repositories.Users;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer(); // Required for endpoint discovery
 builder.Services.AddSwaggerGen(); // Registers Swagger generator
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite("Data Source=app.db"));
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 // No caso de Frontend(Vue, React, Angular) será necessário utilizar CORS
 
@@ -16,8 +18,7 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite("Data S
 
 var app = builder.Build();
 
-// Criar banco automaticamente
-using (var scope = app.Services.CreateScope())
+using(var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.EnsureCreated();

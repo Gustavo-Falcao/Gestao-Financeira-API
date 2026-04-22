@@ -1,4 +1,4 @@
-namespace GestaoFinanceira.Models.Enuns
+namespace Gestao_Financeira.Models.Enuns
 {
     public enum TipoConta
     {
