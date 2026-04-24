@@ -1,11 +1,19 @@
 namespace Gestao_Financeira.Models.Entities
 {
-    public class User(string nome, string email, string senhaHash)
+    public class User
     {
-        public string? Id { get; private set; } = Guid.NewGuid().ToString("N");
-        public string? Nome { get; private set; } = nome;
-        public string? Email { get; private set; } = email;
-        public string? SenhaHash { get; private set; } = BCrypt.Net.BCrypt.HashPassword(senhaHash);
+        public string Id { get; private set; } = string.Empty;
+        public string Nome { get; private set; } = string.Empty;
+        public string Email { get; private set; } = string.Empty;
+        public string SenhaHash { get; private set; } = string.Empty;
+
+        public User(string nome, string email, string senhaHash)
+        {
+            Id = Guid.NewGuid().ToString("N");
+            Nome = nome;
+            Email = email;
+            SenhaHash = BCrypt.Net.BCrypt.HashPassword(senhaHash);
+        }
 
         public void AlterarNome(string novoNome)
         {
@@ -19,7 +27,7 @@ namespace Gestao_Financeira.Models.Entities
 
         public void AlterarSenhaHash(string novaSenhaHash)
         {
-            SenhaHash = novaSenhaHash;
+            SenhaHash = BCrypt.Net.BCrypt.HashPassword(novaSenhaHash);
         }
 
     }

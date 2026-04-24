@@ -1,6 +1,5 @@
 using Gestao_Financeira.Models.Dtos;
-using Gestao_Financeira.Models.Entities;
-using Gestao_Financeira.Repositories.Users;
+using Gestao_Financeira.Services.UserService;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gestao_Financeira.Controllers
@@ -9,11 +8,11 @@ namespace Gestao_Financeira.Controllers
     [Route("api/users")]
     public class UserController : ControllerBase
     {
-        private readonly IUserRepository _repo;
+        private readonly IUserService _userService;
 
-        public UserController(IUserRepository repo)
+        public UserController(IUserService userService)
         {
-            _repo = repo;
+            _userService = userService;
         }
 
         [HttpGet]
@@ -21,7 +20,7 @@ namespace Gestao_Financeira.Controllers
         {
             try
             {
-                return Ok(_repo.GetAll());
+                return Ok(_userService.GetAll());
             } catch (Exception e)
             {
                 return NotFound(e.Message);
@@ -33,7 +32,7 @@ namespace Gestao_Financeira.Controllers
         {
             try
             {
-                var user = _repo.GetById(id);
+                var user = _userService.GetById(id);
                 return Ok(user);
             } catch (Exception e)
             {
@@ -43,17 +42,17 @@ namespace Gestao_Financeira.Controllers
         }
 
         [HttpPost]
-        public IActionResult Post(UserPostRequestBody userPostRequestBody)
+        public IActionResult Post(UserCreateRequest userCreateRequest)
         {
-            return Ok(_repo.Add(userPostRequestBody));
+            return Ok(_userService.Add(userCreateRequest));
         }
 
         [HttpPut("{id}")]
-        public IActionResult Put(User user, string id)
+        public IActionResult Put(UserUpdateRequest userUpdateRequest, string id)
         {
             try
             {
-                _repo.Update(user, id);
+                _userService.Update(userUpdateRequest, id);
                 return Ok("Atualizado com sucesso");
             } catch (Exception e)
             {
@@ -66,7 +65,7 @@ namespace Gestao_Financeira.Controllers
         {
             try
             {
-                _repo.Delete(id);
+                _userService.Delete(id);
                 return Ok("Removido com sucesso");
             } catch (Exception e)
             {
