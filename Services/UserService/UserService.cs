@@ -1,3 +1,4 @@
+using Gestao_Financeira.Exceptions;
 using Gestao_Financeira.Models.Dtos;
 using Gestao_Financeira.Models.Entities;
 using Gestao_Financeira.Repositories.UserRepository;
@@ -43,7 +44,8 @@ namespace Gestao_Financeira.Services.UserService
 
         public UserResponseDto Add(UserCreateRequest userCreateRequest)
         {
-            // fazer validacoes
+            EmailJaExisteEmUser(userCreateRequest.Email, null);
+
             User user = new (userCreateRequest.Nome, userCreateRequest.Email, userCreateRequest.Senha);
 
             _userRepository.Add(user);
@@ -60,8 +62,13 @@ namespace Gestao_Financeira.Services.UserService
         {
             User user = GetByIdOrElseThrowException(id);
 
-            user.AlterarNome(userUpdateRequest.Nome);
-            user.AlterarEmail(userUpdateRequest.Email);
+            EmailJaExisteEmUser(userUpdateRequest.Email, id);
+
+            if(user.Nome != userUpdateRequest.Nome)
+                user.AlterarNome(userUpdateRequest.Nome);
+            
+            if(user.Email != userUpdateRequest.Email)
+                user.AlterarEmail(userUpdateRequest.Email);
 
             _userRepository.Save();
         }
@@ -74,7 +81,15 @@ namespace Gestao_Financeira.Services.UserService
 
         private User GetByIdOrElseThrowException(string id)
         {
-            return _userRepository.GetById(id) ?? throw new Exception("Usuário não encontrado");
+            return _userRepository.GetById(id) ?? throw new NotFoundException("Usuário não encontrado");
+        }
+
+        private void EmailJaExisteEmUser(string email, string idIgnore)
+        {
+            if(_userRepository.GetAll()
+                .Where(user => idIgnore == null || user.Id != idIgnore)
+                .Any(user => user.Email == email))
+                    throw new EmailJaCadastradoException();
         }
     }
 }
