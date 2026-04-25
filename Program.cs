@@ -1,5 +1,7 @@
 using Gestao_Financeira.Data;
+using Gestao_Financeira.Repositories.ContaRepository;
 using Gestao_Financeira.Repositories.UserRepository;
+using Gestao_Financeira.Services.ContaService;
 using Gestao_Financeira.Services.UserService;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,10 +13,14 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer(); // Required for endpoint discovery
 builder.Services.AddSwaggerGen(); // Registers Swagger generator
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite("Data Source=app.db"));
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IUserService, UserService>();
 
-// Registro de Repos abaixo
+// Repositories
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IContaService, ContaService>();
+
+// Services
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IContaRepository, ContaRepository>();
 
 var app = builder.Build();
 

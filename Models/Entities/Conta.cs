@@ -9,11 +9,6 @@ namespace Gestao_Financeira.Models.Entities
         public TipoConta TipoConta { get; private set; } = tipoConta;
         public decimal SaldoInicial { get; private set; } = saldoInicial;
         public string? UsuarioId { get; private set; } = usuarioId;
-        
-        public void AlterarId(string novoId)
-        {
-            Id = novoId;    
-        }
 
         public void AlterarNome(string novoNome)
         {
@@ -28,11 +23,6 @@ namespace Gestao_Financeira.Models.Entities
         public void AlterarSaldoInicial(decimal novoSaldoInicial)
         {
             SaldoInicial = novoSaldoInicial;
-        }
-
-        public void AlterarUsuarioId(string novoUsuarioId)
-        {
-            UsuarioId = novoUsuarioId;
         }
     }
 
