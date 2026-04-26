@@ -13,11 +13,6 @@ namespace Gestao_Financeira.Models.Entities
         public string? ContaId { get; private set; } = contaId;
         public string? CategoriaId { get; private set; } = categoriaId;
 
-        public void AlterarId(string novoId)
-        {
-            Id = novoId;
-        }
-
         public void AlterarDescricao(string novaDescricao)
         {
             Descricao = novaDescricao;
@@ -37,21 +32,5 @@ namespace Gestao_Financeira.Models.Entities
         {
             Data = novaData;
         }
-
-        public void AlterarUsuarioId(string novoUsuarioId)
-        {
-            UsuarioId = novoUsuarioId;
-        }
-
-        public void AlterarContaId(string novaContaId)
-        {
-            ContaId = novaContaId;
-        }
-
-        public void AlterarCategoriaId(string novaCategoriaId)
-        {
-            CategoriaId = novaCategoriaId;
-        }
-
     }
 }

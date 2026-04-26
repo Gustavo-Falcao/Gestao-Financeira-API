@@ -1,7 +1,9 @@
 using Gestao_Financeira.Data;
 using Gestao_Financeira.Repositories.ContaRepository;
+using Gestao_Financeira.Repositories.TransacaoRepository;
 using Gestao_Financeira.Repositories.UserRepository;
 using Gestao_Financeira.Services.ContaService;
+using Gestao_Financeira.Services.TransacaoService;
 using Gestao_Financeira.Services.UserService;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,10 +19,12 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite("Data S
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IContaService, ContaService>();
+builder.Services.AddScoped<ITransacaoService, TransacaoService>();
 
 // Services
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IContaRepository, ContaRepository>();
+builder.Services.AddScoped<ITransacaoRepository, TransacaoRepository>();
 
 var app = builder.Build();
 
