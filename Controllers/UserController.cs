@@ -1,5 +1,5 @@
 using Gestao_Financeira.Exceptions;
-using Gestao_Financeira.Models.Dtos;
+using Gestao_Financeira.Models.Dtos.UserDTOs;
 using Gestao_Financeira.Services.UserService;
 using Microsoft.AspNetCore.Mvc;
 

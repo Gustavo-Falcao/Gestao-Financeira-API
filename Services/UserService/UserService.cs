@@ -1,5 +1,5 @@
 using Gestao_Financeira.Exceptions;
-using Gestao_Financeira.Models.Dtos;
+using Gestao_Financeira.Models.Dtos.UserDTOs;
 using Gestao_Financeira.Models.Entities;
 using Gestao_Financeira.Repositories.UserRepository;
 
@@ -25,14 +25,14 @@ namespace Gestao_Financeira.Services.UserService
                 })
                 .ToList();
 
-            if(usersResponseDto.Count == 0) throw new Exception("Nenhum usuario encontrado");
+            if(usersResponseDto.Count == 0) throw new NotFoundException("Nenhum usuario encontrado");
 
             return usersResponseDto;
         }
 
         public UserResponseDto GetById(string id)
         {
-            var user = GetByIdOrElseThrowException(id);
+            var user = GetByIdOrElseThrowNotFoundException(id);
 
             return new UserResponseDto
             {
@@ -44,7 +44,7 @@ namespace Gestao_Financeira.Services.UserService
 
         public UserResponseDto Add(UserCreateRequest userCreateRequest)
         {
-            EmailJaExisteEmUser(userCreateRequest.Email, null);
+            EmailJaExisteEmUser(userCreateRequest.Email);
 
             User user = new (userCreateRequest.Nome, userCreateRequest.Email, userCreateRequest.Senha);
 
@@ -60,31 +60,44 @@ namespace Gestao_Financeira.Services.UserService
 
         public void Update(UserUpdateRequest userUpdateRequest, string id)
         {
-            User user = GetByIdOrElseThrowException(id);
+            User user = GetByIdOrElseThrowNotFoundException(id);
+            
+            if(!string.IsNullOrWhiteSpace(userUpdateRequest.Email))
+            {
+                EmailJaExisteEmUser(userUpdateRequest.Email, id);
+                user.AlterarEmail(userUpdateRequest.Email);
+            }
 
-            EmailJaExisteEmUser(userUpdateRequest.Email, id);
-
-            if(user.Nome != userUpdateRequest.Nome)
+            if(userUpdateRequest.Nome is not null)
                 user.AlterarNome(userUpdateRequest.Nome);
             
-            if(user.Email != userUpdateRequest.Email)
-                user.AlterarEmail(userUpdateRequest.Email);
+            if(!string.IsNullOrWhiteSpace(userUpdateRequest.Senha))
+            {
+                var novaSenhaHash = BCrypt.Net.BCrypt.HashPassword(userUpdateRequest.Senha);
+                user.AlterarSenhaHash(novaSenhaHash);
+            }
 
             _userRepository.Save();
         }
 
         public void Delete(string id)
         {
-            User user = GetByIdOrElseThrowException(id);
+            User user = GetByIdOrElseThrowNotFoundException(id);
             _userRepository.Delete(user);
         }
 
-        private User GetByIdOrElseThrowException(string id)
+        private User GetByIdOrElseThrowNotFoundException(string id)
         {
             return _userRepository.GetById(id) ?? throw new NotFoundException("Usuário não encontrado");
         }
 
-        private void EmailJaExisteEmUser(string email, string idIgnore)
+        public void ExistsById(string id)
+        {
+            if(_userRepository.GetById(id) is null) 
+                throw new NotFoundException("Usuário não encontrado");
+        }
+
+        private void EmailJaExisteEmUser(string email, string? idIgnore = null)
         {
             if(_userRepository.GetAll()
                 .Where(user => idIgnore == null || user.Id != idIgnore)

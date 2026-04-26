@@ -1,4 +1,4 @@
-using Gestao_Financeira.Models.Dtos;
+using Gestao_Financeira.Models.Dtos.UserDTOs;
 
 namespace Gestao_Financeira.Services.UserService
 {
@@ -6,6 +6,7 @@ namespace Gestao_Financeira.Services.UserService
     {
         List<UserResponseDto> GetAll();
         UserResponseDto GetById(string id);
+        void ExistsById(string id);
         UserResponseDto Add(UserCreateRequest userCreateRequest);
         void Update(UserUpdateRequest userUpdateRequest, string id);
         void Delete(string id);

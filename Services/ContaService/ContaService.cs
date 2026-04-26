@@ -1,16 +1,21 @@
+using Gestao_Financeira.Exceptions;
 using Gestao_Financeira.Models.Dtos.ContaDTOs;
 using Gestao_Financeira.Models.Entities;
+using Gestao_Financeira.Models.Enuns;
 using Gestao_Financeira.Repositories.ContaRepository;
+using Gestao_Financeira.Services.UserService;
 
 namespace Gestao_Financeira.Services.ContaService
 {
     public class ContaService : IContaService
     {
         private readonly IContaRepository _contaRepository;
+        private readonly IUserService _userService;
 
-        public ContaService(IContaRepository contaRepository)
+        public ContaService(IContaRepository contaRepository, IUserService userService)
         {
             _contaRepository = contaRepository;
+            _userService = userService;
         }
 
         public List<ContaResponseDto> GetAll()
@@ -27,7 +32,7 @@ namespace Gestao_Financeira.Services.ContaService
                 .ToList();
 
             if (contas.Count == 0)
-                throw new Exception("Nenhuma conta encontrada");
+                throw new NotFoundException("Nenhuma conta encontrada");
 
             return contas;
         }
@@ -48,13 +53,20 @@ namespace Gestao_Financeira.Services.ContaService
 
         public ContaResponseDto Add(ContaCreateRequest request)
         {
-            if (request.SaldoInicial < 0)
-                throw new Exception("Saldo inicial não pode ser negativo");
+            if(!Enum.IsDefined(typeof(TipoConta), request.TipoConta))
+                throw new ValidationException("Tipo de conta inválido");
+
+            decimal saldoInicial = request.SaldoInicial ?? 0;
+
+            if (saldoInicial < 0)
+                throw new ValidationException("Saldo inicial não pode ser negativo");
+
+            _userService.ExistsById(request.UsuarioId);
 
             Conta conta = new(
                 request.Nome,
                 request.TipoConta,
-                request.SaldoInicial,
+                saldoInicial,
                 request.UsuarioId
             );
 
@@ -74,9 +86,24 @@ namespace Gestao_Financeira.Services.ContaService
         {
             var conta = GetByIdOrThrow(id);
 
-            conta.AlterarNome(request.Nome);
-            conta.AlterarTipoConta(request.TipoConta);
-            conta.AlterarSaldoInicial(request.SaldoInicial);
+            if(request.Nome is not null)
+                conta.AlterarNome(request.Nome);
+
+            if(request.TipoConta.HasValue)
+            {
+                if(!Enum.IsDefined(typeof(TipoConta), request.TipoConta))
+                    throw new ValidationException("Tipo de conta inválido");
+
+                conta.AlterarTipoConta(request.TipoConta.Value);
+            }
+            
+            if(request.SaldoInicial.HasValue)
+            {
+                if(request.SaldoInicial.Value < 0)
+                    throw new ValidationException("Saldo inicial não pode ser negativo");
+
+                conta.AlterarSaldoInicial(request.SaldoInicial.Value);
+            }
 
             _contaRepository.Save();
         }
@@ -89,8 +116,7 @@ namespace Gestao_Financeira.Services.ContaService
 
         private Conta GetByIdOrThrow(string id)
         {
-            return _contaRepository.GetById(id)
-                ?? throw new Exception("Conta não encontrada");
+            return _contaRepository.GetById(id) ?? throw new NotFoundException("Conta não encontrada");
         }
     }
 }

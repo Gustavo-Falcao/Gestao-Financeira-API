@@ -1,4 +1,4 @@
-namespace Gestao_Financeira.Models.Dtos
+namespace Gestao_Financeira.Models.Dtos.UserDTOs
 {
     public class UserResponseDto
     {
