@@ -9,11 +9,6 @@ namespace Gestao_Financeira.Models.Entities
         public TipoMovimentacao TipoMovimentacao { get; private set; } = tipoMovimentacao;
         public string? UsuarioId { get; private set; } = usuarioId;
 
-        public void AlterarId(string novoId)
-        {
-            Id = novoId;
-        }
-
         public void AlterarNome(string novoNome)
         {
             Nome = novoNome;
@@ -22,11 +17,6 @@ namespace Gestao_Financeira.Models.Entities
         public void AlterarTipoMovimentacao(TipoMovimentacao novoTipoMovimentacao)
         {
             TipoMovimentacao = novoTipoMovimentacao;
-        }
-
-        public void AlterarUsuarioId(string novoUsuarioId)
-        {
-            UsuarioId = novoUsuarioId;
         }
      }
 }
