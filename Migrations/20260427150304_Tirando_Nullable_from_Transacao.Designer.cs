@@ -3,6 +3,7 @@ using System;
 using Gestao_Financeira.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Gestao_Financeira.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260427150304_Tirando_Nullable_from_Transacao")]
+    partial class Tirando_Nullable_from_Transacao
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.7");
@@ -23,14 +26,12 @@ namespace Gestao_Financeira.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Nome")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("TipoMovimentacao")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("UsuarioId")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -44,7 +45,6 @@ namespace Gestao_Financeira.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Nome")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("SaldoInicial")
@@ -54,7 +54,6 @@ namespace Gestao_Financeira.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("UsuarioId")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");

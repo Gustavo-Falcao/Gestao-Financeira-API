@@ -1,5 +1,6 @@
 using Gestao_Financeira.Exceptions;
 using Gestao_Financeira.Models.Dtos.UserDTOs;
+using Gestao_Financeira.Services.ProfileService;
 using Gestao_Financeira.Services.UserService;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,10 +11,12 @@ namespace Gestao_Financeira.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IProfileService _profileService;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService, IProfileService profileService)
         {
             _userService = userService;
+            _profileService = profileService;
         }
 
         [HttpGet]
@@ -63,7 +66,15 @@ namespace Gestao_Financeira.Controllers
                     _userService.Delete(id);
                     return Ok("Removido com sucesso");
                 });
-            
+        }
+
+        [HttpGet("{id}/perfil")]
+        public IActionResult GetProfileById(string id)
+        {
+            return ExecutarComTratamentoDeException(() =>
+            {
+                return Ok(_profileService.GetProfileById(id));
+            });
         }
 
         private IActionResult ExecutarComTratamentoDeException(Func<IActionResult> acao)
@@ -77,6 +88,9 @@ namespace Gestao_Financeira.Controllers
             } catch (EmailJaCadastradoException e)
             {
                 return Conflict(new { message = e.Message});
+            } catch (Exception e)
+            {
+                return BadRequest(new { message = e.Message});
             }
         }
     }

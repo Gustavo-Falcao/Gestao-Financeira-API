@@ -5,6 +5,7 @@ using Gestao_Financeira.Repositories.TransacaoRepository;
 using Gestao_Financeira.Repositories.UserRepository;
 using Gestao_Financeira.Services.CategoriaService;
 using Gestao_Financeira.Services.ContaService;
+using Gestao_Financeira.Services.ProfileService;
 using Gestao_Financeira.Services.TransacaoService;
 using Gestao_Financeira.Services.UserService;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +31,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IContaRepository, ContaRepository>();
 builder.Services.AddScoped<ITransacaoRepository, TransacaoRepository>();
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
+builder.Services.AddScoped<IProfileService, ProfileService>();
 
 var app = builder.Build();
 

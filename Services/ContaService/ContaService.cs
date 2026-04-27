@@ -3,6 +3,7 @@ using Gestao_Financeira.Models.Dtos.ContaDTOs;
 using Gestao_Financeira.Models.Entities;
 using Gestao_Financeira.Models.Enuns;
 using Gestao_Financeira.Repositories.ContaRepository;
+using Gestao_Financeira.Repositories.UserRepository;
 using Gestao_Financeira.Services.UserService;
 
 namespace Gestao_Financeira.Services.ContaService
@@ -10,12 +11,12 @@ namespace Gestao_Financeira.Services.ContaService
     public class ContaService : IContaService
     {
         private readonly IContaRepository _contaRepository;
-        private readonly IUserService _userService;
+        private readonly IUserRepository _userRepository;
 
-        public ContaService(IContaRepository contaRepository, IUserService userService)
+        public ContaService(IContaRepository contaRepository, IUserRepository userRepository)
         {
             _contaRepository = contaRepository;
-            _userService = userService;
+            _userRepository = userRepository;
         }
 
         public List<ContaResponseDto> GetAll()
@@ -35,6 +36,21 @@ namespace Gestao_Financeira.Services.ContaService
                 throw new NotFoundException("Nenhuma conta encontrada");
 
             return contas;
+        }
+
+        public List<ContaResponseDto> GetByUsuarioId(string usuarioId)
+        {
+            return _contaRepository.GetAll()
+                .Where(c => c.UsuarioId == usuarioId)
+                .Select(c => new ContaResponseDto
+                {
+                    Id = c.Id,
+                    Nome = c.Nome,
+                    TipoConta = c.TipoConta,
+                    SaldoInicial = c.SaldoInicial,
+                    UsuarioId = c.UsuarioId
+                })
+                .ToList();  
         }
 
         public ContaResponseDto GetById(string id)
@@ -61,7 +77,8 @@ namespace Gestao_Financeira.Services.ContaService
             if (saldoInicial < 0)
                 throw new ValidationException("Saldo inicial não pode ser negativo");
 
-            _userService.ExistsById(request.UsuarioId);
+            if(_userRepository.GetById(request.UsuarioId) is null)
+                throw new ValidationException("Usuário não encontrado");
 
             Conta conta = new(
                 request.Nome,
@@ -86,12 +103,12 @@ namespace Gestao_Financeira.Services.ContaService
         {
             var conta = GetByIdOrThrow(id);
 
-            if(request.Nome is not null)
+            if(!string.IsNullOrWhiteSpace(request.Nome))
                 conta.AlterarNome(request.Nome);
 
             if(request.TipoConta.HasValue)
             {
-                if(!Enum.IsDefined(typeof(TipoConta), request.TipoConta))
+                if(!Enum.IsDefined(typeof(TipoConta), request.TipoConta.Value))
                     throw new ValidationException("Tipo de conta inválido");
 
                 conta.AlterarTipoConta(request.TipoConta.Value);
@@ -112,6 +129,12 @@ namespace Gestao_Financeira.Services.ContaService
         {
             var conta = GetByIdOrThrow(id);
             _contaRepository.Delete(conta);
+        }
+
+        public void ExistsById(string id)
+        {
+            if(_contaRepository.GetById(id) is null)
+                throw new NotFoundException("Conta não encontrada");
         }
 
         private Conta GetByIdOrThrow(string id)

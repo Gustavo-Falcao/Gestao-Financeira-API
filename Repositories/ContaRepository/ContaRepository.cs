@@ -17,6 +17,13 @@ namespace Gestao_Financeira.Repositories.ContaRepository
             return _context.Contas.ToList();
         }
 
+        public List<Conta> GetByUsuarioId(string usuarioId)
+        {
+            return GetAll()
+                .Where(c => c.UsuarioId == usuarioId)
+                .ToList();
+        }
+
         public Conta? GetById(string id)
         {
             return _context.Contas.Find(id);
