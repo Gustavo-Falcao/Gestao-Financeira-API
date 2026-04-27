@@ -1,4 +1,5 @@
 using Gestao_Financeira.Exceptions;
+using Gestao_Financeira.Models.Dtos;
 using Gestao_Financeira.Models.Dtos.ContaDTOs;
 using Gestao_Financeira.Services.ContaService;
 using Microsoft.AspNetCore.Mvc;
@@ -39,7 +40,8 @@ namespace Gestao_Financeira.Controllers
         {
             return ExecutarComTratamentoDeException(() =>
             {
-                return Ok(_contaService.Add(request));    
+                ContaResponseDto contaResponseDto = _contaService.Add(request);
+                return Created($"api/contas/{contaResponseDto.Id}", contaResponseDto);
             });
         }
 

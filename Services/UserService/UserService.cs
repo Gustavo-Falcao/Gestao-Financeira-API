@@ -8,7 +8,7 @@ namespace Gestao_Financeira.Services.UserService
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
-
+        
         public UserService(IUserRepository userRepository)
         {
             _userRepository = userRepository;
@@ -68,7 +68,7 @@ namespace Gestao_Financeira.Services.UserService
                 user.AlterarEmail(userUpdateRequest.Email);
             }
 
-            if(userUpdateRequest.Nome is not null)
+            if(!string.IsNullOrWhiteSpace(userUpdateRequest.Nome))
                 user.AlterarNome(userUpdateRequest.Nome);
             
             if(!string.IsNullOrWhiteSpace(userUpdateRequest.Senha))

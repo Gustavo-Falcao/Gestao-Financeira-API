@@ -4,10 +4,10 @@ namespace Gestao_Financeira.Models.Entities
 {
     public class Categoria (string nome, TipoMovimentacao tipoMovimentacao, string usuarioId)
     {
-        public string? Id { get; private set; } = Guid.NewGuid().ToString("N");
-        public string? Nome { get; private set; } = nome;
+        public string Id { get; private set; } = Guid.NewGuid().ToString("N");
+        public string Nome { get; private set; } = nome;
         public TipoMovimentacao TipoMovimentacao { get; private set; } = tipoMovimentacao;
-        public string? UsuarioId { get; private set; } = usuarioId;
+        public string UsuarioId { get; private set; } = usuarioId;
 
         public void AlterarNome(string novoNome)
         {

@@ -17,6 +17,13 @@ namespace Gestao_Financeira.Repositories.CategoriaRepository
             return _context.Categorias.ToList();
         }
 
+        public List<Categoria> GetByUsuarioId(string usuarioId)
+        {
+            return GetAll()
+                .Where(c => c.UsuarioId == usuarioId)
+                .ToList();
+        }
+
         public Categoria? GetById(string id)
         {
             return _context.Categorias.Find(id);

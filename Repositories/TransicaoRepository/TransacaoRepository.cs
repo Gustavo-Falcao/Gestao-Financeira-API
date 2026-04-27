@@ -17,6 +17,13 @@ namespace Gestao_Financeira.Repositories.TransacaoRepository
             return _context.Transacoes.ToList();
         }
 
+        public List<Transacao> GetByUsuarioId(string usuarioId)
+        {
+            return GetAll()
+                .Where(t => t.UsuarioId == usuarioId)
+                .ToList();
+        }
+
         public Transacao? GetById(string id)
         {
             return _context.Transacoes.Find(id);
