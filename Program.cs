@@ -1,3 +1,5 @@
+using System.Text;
+using System.Text.Json.Serialization;
 using Gestao_Financeira.Data;
 using Gestao_Financeira.Repositories.CategoriaRepository;
 using Gestao_Financeira.Repositories.ContaRepository;
@@ -8,13 +10,36 @@ using Gestao_Financeira.Services.ContaService;
 using Gestao_Financeira.Services.ProfileService;
 using Gestao_Financeira.Services.TransacaoService;
 using Gestao_Financeira.Services.UserService;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
+var key = "my-extremely-secret-key-with-more-than-32-characters";
 
-// Add services to the container.
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
+    };
+});
+
 builder.Services.AddOpenApi();
-builder.Services.AddControllers();
+builder.Services.AddAuthorization();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 builder.Services.AddEndpointsApiExplorer(); // Required for endpoint discovery
 builder.Services.AddSwaggerGen(); // Registers Swagger generator
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite("Data Source=app.db"));
@@ -51,6 +76,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
