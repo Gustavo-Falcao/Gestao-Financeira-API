@@ -8,14 +8,14 @@ namespace Gestao_Financeira.Models.Entities
         public string Nome { get; private set; } = string.Empty;
         public string Email { get; private set; } = string.Empty;
         public string SenhaHash { get; private set; } = string.Empty;
-        public UserRole userRole { get; private set; } = UserRole.USER;
+        public UserRole UserRole { get; private set; } = UserRole.USER;
 
         public User(string nome, string email, string senhaHash)
         {
             Id = Guid.NewGuid().ToString("N");
             Nome = nome;
             Email = email;
-            SenhaHash = BCrypt.Net.BCrypt.HashPassword(senhaHash);
+            SenhaHash = senhaHash;
         }
 
         public void AlterarNome(string novoNome)

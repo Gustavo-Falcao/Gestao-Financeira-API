@@ -2,6 +2,7 @@ using Gestao_Financeira.Exceptions;
 using Gestao_Financeira.Models.Dtos.UserDTOs;
 using Gestao_Financeira.Services.ProfileService;
 using Gestao_Financeira.Services.UserService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gestao_Financeira.Controllers
@@ -19,6 +20,7 @@ namespace Gestao_Financeira.Controllers
             _profileService = profileService;
         }
 
+        [Authorize(Roles = "ADMIN")]
         [HttpGet]
         public IActionResult Get()
         {

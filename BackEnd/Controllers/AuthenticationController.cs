@@ -17,7 +17,7 @@ namespace Gestao_Financeira.Controllers
             _authenticationService = authenticationService;
         }
         
-        [HttpPost("/login")]
+        [HttpPost("login")]
         public IActionResult Login(UserLoginRequestDto userLoginRequestDto)
         {
             try
