@@ -5,6 +5,7 @@ using Gestao_Financeira.Repositories.CategoriaRepository;
 using Gestao_Financeira.Repositories.ContaRepository;
 using Gestao_Financeira.Repositories.TransacaoRepository;
 using Gestao_Financeira.Repositories.UserRepository;
+using Gestao_Financeira.Services.AuthenticationService;
 using Gestao_Financeira.Services.CategoriaService;
 using Gestao_Financeira.Services.ContaService;
 using Gestao_Financeira.Services.ProfileService;
@@ -57,6 +58,7 @@ builder.Services.AddScoped<IContaRepository, ContaRepository>();
 builder.Services.AddScoped<ITransacaoRepository, TransacaoRepository>();
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 
 var app = builder.Build();
 

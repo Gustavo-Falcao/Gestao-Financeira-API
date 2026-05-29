@@ -16,7 +16,7 @@ namespace Gestao_Financeira.Services.UserService
 
         public List<UserResponseDto> GetAll()
         {
-            var usersResponseDto = _userRepository.GetAll()
+            var usersResponseDtoList = _userRepository.GetAll()
                 .Select(user => new UserResponseDto
                 {
                     Id = user.Id,
@@ -25,9 +25,7 @@ namespace Gestao_Financeira.Services.UserService
                 })
                 .ToList();
 
-            if(usersResponseDto.Count == 0) throw new NotFoundException("Nenhum usuario encontrado");
-
-            return usersResponseDto;
+            return usersResponseDtoList;
         }
 
         public UserResponseDto GetById(string id)
@@ -46,7 +44,9 @@ namespace Gestao_Financeira.Services.UserService
         {
             EmailJaExisteEmUser(userCreateRequest.Email);
 
-            User user = new (userCreateRequest.Nome, userCreateRequest.Email, userCreateRequest.Senha);
+            string senhaHash = BCrypt.Net.BCrypt.HashPassword(userCreateRequest.Senha);
+
+            User user = new (userCreateRequest.Nome, userCreateRequest.Email, senhaHash);
 
             _userRepository.Add(user);
 
