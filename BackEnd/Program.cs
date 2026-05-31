@@ -33,7 +33,6 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
     };
 });
-
 builder.Services.AddOpenApi();
 builder.Services.AddAuthorization();
 builder.Services.AddControllers()
@@ -44,20 +43,29 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer(); // Required for endpoint discovery
 builder.Services.AddSwaggerGen(); // Registers Swagger generator
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite("Data Source=app.db"));
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+    policy =>
+    policy.AllowAnyOrigin()
+    .AllowAnyHeader()
+    .AllowAnyMethod());
+});
+
 
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IContaService, ContaService>();
-builder.Services.AddScoped<ITransacaoService, TransacaoService>();
-builder.Services.AddScoped<ICategoriaService, CategoriaService>();
+builder.Services.AddScoped<IContaRepository, ContaRepository>();
+builder.Services.AddScoped<ITransacaoRepository, TransacaoRepository>();
+builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 
 
 // Services
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IContaRepository, ContaRepository>();
-builder.Services.AddScoped<ITransacaoRepository, TransacaoRepository>();
-builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<ITransacaoService, TransacaoService>();
+builder.Services.AddScoped<ICategoriaService, CategoriaService>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 
 var app = builder.Build();
@@ -80,6 +88,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseCors("AllowAll");
 app.MapControllers();
 
 app.Run();

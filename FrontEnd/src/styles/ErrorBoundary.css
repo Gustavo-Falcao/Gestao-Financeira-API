@@ -1,0 +1,26 @@
+.error-page {
+  min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  justify-content: center;
+  align-items: center;
+
+  gap: 1rem;
+
+  background: #0f172a;
+
+  color: white;
+}
+
+.error-page button {
+
+  padding: .8rem 1.5rem;
+
+  border: none;
+
+  border-radius: 8px;
+
+  cursor: pointer;
+}

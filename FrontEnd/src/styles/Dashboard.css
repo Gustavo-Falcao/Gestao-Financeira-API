@@ -1,0 +1,184 @@
+.dashboard-page {
+  display: flex;
+  min-height: 100vh;
+  background: #0f172a;
+  color: white;
+}
+
+.sidebar {
+  width: 260px;
+
+  background: rgba(255,255,255,.05);
+
+  backdrop-filter: blur(20px);
+
+  border-right: 1px solid rgba(255,255,255,.1);
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 2rem;
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  margin-top: 2rem;
+}
+
+.sidebar a {
+  color: white;
+  text-decoration: none;
+}
+
+.dashboard-content {
+  flex: 1;
+  padding: 3rem;
+}
+
+.cards {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.card {
+  flex: 1;
+
+  background: rgba(255,255,255,.05);
+
+  backdrop-filter: blur(20px);
+
+  border: 1px solid rgba(255,255,255,.1);
+
+  border-radius: 16px;
+
+  padding: 1.5rem;
+}
+
+.card span {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.transactions-panel {
+  margin-top: 2rem;
+
+  background: rgba(255,255,255,.05);
+
+  backdrop-filter: blur(20px);
+
+  border-radius: 16px;
+
+  padding: 1.5rem;
+}
+
+.transaction-item {
+  display: flex;
+  justify-content: space-between;
+
+  padding: 1rem 0;
+
+  border-bottom: 1px solid rgba(255,255,255,.1);
+}
+
+.income {
+  color: #22c55e;
+}
+
+.expense {
+  color: #ef4444;
+}
+
+.logout-btn {
+  margin-top: auto;
+
+  background: #ef4444;
+  color: white;
+
+  border: none;
+  padding: .8rem;
+
+  border-radius: 8px;
+
+  cursor: pointer;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 2rem;
+}
+
+.list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.list-card {
+  background: rgba(255,255,255,.05);
+  backdrop-filter: blur(20px);
+
+  border: 1px solid rgba(255,255,255,.1);
+
+  border-radius: 16px;
+
+  padding: 1rem 1.5rem;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.form-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  max-width: 500px;
+
+  background: rgba(255,255,255,.05);
+
+  backdrop-filter: blur(20px);
+
+  border-radius: 16px;
+
+  padding: 2rem;
+}
+
+.form-card input,
+.form-card select {
+  padding: .8rem;
+
+  border: none;
+
+  border-radius: 8px;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.edit-btn,
+.delete-btn,
+.btn-primary {
+  border: none;
+  border-radius: 8px;
+
+  padding: .7rem 1rem;
+
+  cursor: pointer;
+
+  text-decoration: none;
+}
+
+.delete-btn {
+  background: #ef4444;
+  color: white;
+}
