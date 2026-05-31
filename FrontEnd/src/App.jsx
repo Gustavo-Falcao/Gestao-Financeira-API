@@ -26,54 +26,42 @@ function App() {
       <Route
         path="/dashboard"
         element={
-          <ProtectedRoute>
             <Dashboard />
-          </ProtectedRoute>
         }
       />
 
       <Route
         path="/contas"
         element={
-          <ProtectedRoute>
             <Contas />
-          </ProtectedRoute>
         }
       />
 
       <Route
         path="/contas/nova"
         element={
-          <ProtectedRoute>
             <NovaConta />
-          </ProtectedRoute>
         }
       />
 
       <Route
         path="/contas/:id"
         element={
-          <ProtectedRoute>
             <EditarConta />
-          </ProtectedRoute>
         }
       />
 
       <Route
         path="/transacoes"
         element={
-          <ProtectedRoute>
             <Transacoes />
-          </ProtectedRoute>
         }
       />
 
       <Route
         path="/transacoes/nova"
         element={
-          <ProtectedRoute>
             <NovaTransacao />
-          </ProtectedRoute>
         }
       />
 
