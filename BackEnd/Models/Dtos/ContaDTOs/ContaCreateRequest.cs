@@ -11,9 +11,7 @@ namespace Gestao_Financeira.Models.Dtos.ContaDTOs
 
         [Range(1, int.MaxValue, ErrorMessage = "Tipo da conta é obrigatório.")]
         public TipoConta TipoConta { get; set; }
-        public decimal? SaldoInicial { get; set; }
-
-        [Required(ErrorMessage = "Id do usuario é obrigatório.")]
+        public decimal SaldoInicial { get; set; }
         public string UsuarioId { get; set; } = string.Empty;
     }
 }

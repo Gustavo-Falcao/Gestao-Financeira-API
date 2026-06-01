@@ -1,7 +1,9 @@
+using System.Security.Claims;
 using Gestao_Financeira.Exceptions;
 using Gestao_Financeira.Models.Dtos;
 using Gestao_Financeira.Models.Dtos.ContaDTOs;
 using Gestao_Financeira.Services.ContaService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gestao_Financeira.Controllers
@@ -35,21 +37,52 @@ namespace Gestao_Financeira.Controllers
             });
         }
 
+        [Authorize]
+        [HttpGet("byUser")]
+        public IActionResult GetByUserLogado()
+        {
+            return ExecutarComTratamentoDeException(() =>
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if(string.IsNullOrWhiteSpace(userId))
+                    return Unauthorized();
+
+                var contas = _contaService.GetByUsuarioId(userId);
+
+                return Ok(contas);
+            });
+        }
+
+        [Authorize]
         [HttpPost]
         public IActionResult Post(ContaCreateRequest request)
         {
             return ExecutarComTratamentoDeException(() =>
             {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if(string.IsNullOrWhiteSpace(userId))
+                    return Unauthorized();
+                
+                request.UsuarioId = userId;
                 ContaResponseDto contaResponseDto = _contaService.Add(request);
-                return Created($"api/contas/{contaResponseDto.Id}", contaResponseDto);
+                
+                return Created();
             });
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public IActionResult Put(ContaUpdateRequest request, string id)
         {
             return ExecutarComTratamentoDeException(() =>
             {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if(string.IsNullOrWhiteSpace(userId))
+                    return Unauthorized();
+                    
                 _contaService.Update(request, id);
                 return Ok("Atualizado com sucesso");
             });

@@ -18,7 +18,6 @@ namespace Gestao_Financeira.Models.Dtos
         [Required(ErrorMessage = "Data é obrigatória.")]
         public DateOnly? Data { get; set; }
 
-        [Required(ErrorMessage = "Id do usuario é obrigatório.")]
         public string UsuarioId { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Id da conta é obrigatório.")]

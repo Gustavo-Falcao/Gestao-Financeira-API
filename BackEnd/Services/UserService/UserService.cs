@@ -21,7 +21,8 @@ namespace Gestao_Financeira.Services.UserService
                 {
                     Id = user.Id,
                     Nome = user.Nome,
-                    Email = user.Email
+                    Email = user.Email,
+                    UserRole = user.UserRole
                 })
                 .ToList();
 
@@ -34,9 +35,9 @@ namespace Gestao_Financeira.Services.UserService
 
             return new UserResponseDto
             {
-                Id = user.Id,
                 Nome = user.Nome,
-                Email = user.Email
+                Email = user.Email,
+                UserRole = user.UserRole
             };
         }
 

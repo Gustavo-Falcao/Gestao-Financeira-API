@@ -42,16 +42,20 @@ namespace Gestao_Financeira.Controllers
         }
 
         [Authorize]
-        [HttpGet("me/debug")]
+        [HttpGet("me/simple")]
         public IActionResult DebugMe()
         {
-            var claims = User.Claims.Select(c => new
+            return ExecutarComTratamentoDeException(() =>
             {
-                c.Type,
-                c.Value
-            });
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            return Ok(claims);
+                if(string.IsNullOrWhiteSpace(userId))
+                    return Unauthorized("Id do usuário não encontrado no token.");
+
+                var simpleProfile = _userService.GetById(userId);
+
+                return Ok(simpleProfile);
+            });
         }
 
         [Authorize(Roles = "ADMIN")]

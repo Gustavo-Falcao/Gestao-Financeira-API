@@ -1,6 +1,8 @@
+using System.Security.Claims;
 using Gestao_Financeira.Exceptions;
 using Gestao_Financeira.Models.Dtos;
 using Gestao_Financeira.Services.TransacaoService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gestao_Financeira.Controllers
@@ -34,14 +36,39 @@ namespace Gestao_Financeira.Controllers
             });
         }
 
+        [Authorize]
+        [HttpGet("byUser")]
+        public IActionResult GetByUserLogado()
+        {
+            return ExecutarComTratamentoDeException(() =>
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if(string.IsNullOrWhiteSpace(userId))
+                    return Unauthorized();
+
+                var transacoes = _service.GetByUsuarioId(userId);
+
+                return Ok(transacoes);
+            });
+        }
+
+        [Authorize]
         [HttpPost]
         public IActionResult Post(TransacaoCreateRequest request)
         {
             return ExecutarComTratamentoDeException(() =>
             {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if(string.IsNullOrWhiteSpace(userId))
+                    return Unauthorized();
+
+                request.UsuarioId = userId;
+
                 TransacaoResponseDto transacaoResponseDto = _service.Add(request); 
                 
-                return Created($"api/transacoes/{transacaoResponseDto.Id}", transacaoResponseDto);
+                return Created();
             });
         }
 

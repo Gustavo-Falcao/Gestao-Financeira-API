@@ -1,6 +1,8 @@
+using System.Security.Claims;
 using Gestao_Financeira.Exceptions;
 using Gestao_Financeira.Models.Dtos;
 using Gestao_Financeira.Services.CategoriaService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gestao_Financeira.Controllers
@@ -34,13 +36,38 @@ namespace Gestao_Financeira.Controllers
             });
         }
 
+        [Authorize]
+        [HttpGet("byUser")]
+        public IActionResult GetByUserLogado()
+        {
+            return ExecutarComTratamentoDeException(() =>
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if(string.IsNullOrWhiteSpace(userId))
+                    return Unauthorized();
+
+                var categorias = _service.GetByUsuarioId(userId);
+
+                return Ok(categorias);
+            });
+        }
+
         [HttpPost]
         public IActionResult Post(CategoriaCreateRequest request)
         {
             return ExecutarComTratamentoDeException(() =>
             {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if(string.IsNullOrWhiteSpace(userId))
+                    return Unauthorized();
+
+                
+                request.UsuarioId = userId;
                 CategoriaResponseDto categoriaResponseDto = _service.Add(request);
-                return Created($"api/categorias/{categoriaResponseDto.Id}", categoriaResponseDto);
+                
+                return Created();
             });
         }
 

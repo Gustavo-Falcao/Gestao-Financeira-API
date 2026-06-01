@@ -1,24 +1,39 @@
 import { useState } from "react";
 import { replace, useNavigate } from "react-router-dom"
-import InfoPopup from "../components/InfoPopup.jsx";
 
-function Login() {
+function Login({setPropsInfoPopup}) {
     const API_AUTH_URL = "http://localhost:5065/api/auth/login"
     const navigate = useNavigate();
 
     const [isMostrarSenha, setIsMostrarSenha] = useState(false)
     const [emailInput, setEmailInput] = useState("")
     const [senhaInput, setSenhaInput] = useState("")
-    const [propsInfoPopup, setPropsInfoPopup] = useState({
-        msg: "",
-        type: "",
-        isOpen: false
-    })
 
     async function autenticarUsuario() {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const senhaRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)\S{8,50}$/
+
+        if(!emailRegex.test(emailInput)) {
+            setPropsInfoPopup({
+                msg: "Formato de E-mail inválido.",
+                type: "error",
+                isOpen: true
+            })
+            return
+        }
+
+        if(!senhaRegex.test(senhaInput)) {
+            setPropsInfoPopup({
+                msg: "Formato de senha inválido.",
+                type: "error",
+                isOpen: true
+            })
+            return
+        }
+
         const requestLogin = {
-            email: emailInput,
-            senha: senhaInput
+            email: emailInput.trim(),
+            senha: senhaInput.trim()
         }
 
         const responseLogin = await fetch(`${API_AUTH_URL}`, {
@@ -44,16 +59,17 @@ function Login() {
 
         localStorage.setItem("token", token)
 
-        navigate("/", {replace: true})
         setPropsInfoPopup({
             msg: "Login realizado com sucesso!",
             type: "success",
             isOpen: true
         })
+
+        navigate("/", {replace: true})
+        
     }
 
     return (
-        <>
         <div id="page-login" className="auth-page active">
             <div className="auth-bg">
             <div className="auth-orb orb1"></div>
@@ -99,9 +115,6 @@ function Login() {
             <p className="auth-footer">Não tem conta? <a onClick={() => navigate("/cadastro")}>Cadastre-se</a></p>
             </div>
         </div>
-
-        <InfoPopup msg={propsInfoPopup.msg} type={propsInfoPopup.type} isOpen={propsInfoPopup.isOpen} onClose={() => setPropsInfoPopup({msg: "", type: "", isOpen: false})}/>
-        </>
     )
 
 }

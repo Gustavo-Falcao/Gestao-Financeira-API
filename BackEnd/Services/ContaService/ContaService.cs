@@ -72,7 +72,7 @@ namespace Gestao_Financeira.Services.ContaService
             if(!Enum.IsDefined(typeof(TipoConta), request.TipoConta))
                 throw new ValidationException("Tipo de conta inválido");
 
-            decimal saldoInicial = request.SaldoInicial ?? 0;
+            decimal saldoInicial = request.SaldoInicial;
 
             if (saldoInicial < 0)
                 throw new ValidationException("Saldo inicial não pode ser negativo");

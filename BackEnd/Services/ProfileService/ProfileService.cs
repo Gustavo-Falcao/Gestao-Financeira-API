@@ -87,6 +87,8 @@ namespace Gestao_Financeira.Services.ProfileService
                 Nome = user.Nome,
                 Email = user.Email,
                 UserRole = user.UserRole,
+                TotalReceitas = totalReceitas,
+                TotalDespesas = totalDespesas,
                 SaldoTotal = saldoTotal,
                 Contas = contasResponseDtos,
                 Categorias = categoriasResponseDtos,

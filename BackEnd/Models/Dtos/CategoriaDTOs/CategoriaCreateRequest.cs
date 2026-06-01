@@ -11,8 +11,6 @@ namespace Gestao_Financeira.Models.Dtos
 
         [Range(1, int.MaxValue, ErrorMessage = "Tipo da movimentação é obrigatório.")]
         public TipoMovimentacao TipoMovimentacao { get; set; }
-
-        [Required(ErrorMessage = "Id do usuario é obrigatório.")]
         public string UsuarioId { get; set; } = string.Empty;
     }
 }
