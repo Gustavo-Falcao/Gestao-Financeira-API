@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Gestao_Financeira.Exceptions;
 using Gestao_Financeira.Models.Dtos.UserDTOs;
 using Gestao_Financeira.Services.ProfileService;
@@ -18,6 +19,39 @@ namespace Gestao_Financeira.Controllers
         {
             _userService = userService;
             _profileService = profileService;
+        }
+
+        [Authorize]
+        [HttpGet("me")]
+        public IActionResult GetMe()
+        {
+            return ExecutarComTratamentoDeException(() =>
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if(string.IsNullOrWhiteSpace(userId))
+                    return Unauthorized("Id do usuário não encontrado no token.");
+
+                var profile = _profileService.GetProfileById(userId);
+            
+                if(profile == null)
+                    return NotFound("Perfil não encontrado para o usuário autenticado.");
+
+                return Ok(profile);
+            });
+        }
+
+        [Authorize]
+        [HttpGet("me/debug")]
+        public IActionResult DebugMe()
+        {
+            var claims = User.Claims.Select(c => new
+            {
+                c.Type,
+                c.Value
+            });
+
+            return Ok(claims);
         }
 
         [Authorize(Roles = "ADMIN")]

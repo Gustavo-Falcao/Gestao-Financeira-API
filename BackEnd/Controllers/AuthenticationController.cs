@@ -27,7 +27,7 @@ namespace Gestao_Financeira.Controllers
                 
             } catch(InvalidCredentialsException e)
             {
-                return Unauthorized(new { message = e.Message} );
+                return Unauthorized(new { message = e.Message } );
             }
         }
     }
