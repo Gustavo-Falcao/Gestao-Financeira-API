@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { data } from "react-router-dom";
 import { apiHttpMethodHandler } from "../helpers/apiFetch";
 
-function ModalTransacao({ isOpen, onClose, onCreate, setPropsInfoPopup }) {
+function ModalTransacao({ isOpen, onClose, onCreate, setPropsInfoPopup, categorias, contas }) {
     const { apiFetch } = apiHttpMethodHandler();
     const [inputDescricao, setInputDescricao] = useState("");
     const [tipoTransacaoEscolhida, setTipoTransacaoEscolhida] = useState("1")
@@ -10,38 +10,11 @@ function ModalTransacao({ isOpen, onClose, onCreate, setPropsInfoPopup }) {
     const [contaEscolhida, setContaEscolhida] = useState("")
     const [categoriaEscolhida, setCategoriaEscolhida] = useState("")
     const [inputData, setInputData] = useState("")
-    const [categorias, setCategorias] = useState([])
-    const [contas, setContas] = useState([])
 
     console.log("Contas abaixo");
     console.log(contas)
     console.log("categorias abaixo")
     console.log(categorias)
-
-    useEffect(() => {
-        carregarContas()
-        carregarCategorias()
-    }, [])
-
-    async function carregarContas() {
-        const response = await apiFetch("/contas/byUser")
-
-        if(!response) return
-
-        const data = await response.json();
-
-        setContas(data);
-    }
-
-    async function carregarCategorias() {
-        const response = await apiFetch("/categorias/byUser")
-        
-        if(!response) return
-
-        const data = await response.json();
-
-        setCategorias(data);
-    }
 
     function formatarDinheiro(valor) {
         const valorNumerico = Number(valor) / 100

@@ -7,6 +7,7 @@ function Cadastro({setPropsInfoPopup}) {
     const [isMostrarSenha, setIsMostrarSenha] = useState(false)
     const [nomeInptuCreate, setNomeInptuCreate] = useState("")
     const [emailInputCreate, setEmailInputCreate] = useState("")
+    const [senhaInputCreate, setSenhaInputCreate] = useState("")
 
     function validarCampos() {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

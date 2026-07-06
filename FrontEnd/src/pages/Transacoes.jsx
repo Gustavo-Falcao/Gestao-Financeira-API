@@ -10,10 +10,30 @@ function Transacoes({setPropsInfoPopup}) {
     const [isBackGroundModalOpen, setIsBackGroundModalOpen] = useState(false)
     const [isModalTransacaoOpen, setIsModalTransacaoOpen] = useState(false)
     const isTransacoesEmpty = transacoes.length < 1;
+    const [categorias, setCategorias] = useState([])
+    const [contas, setContas] = useState([])
 
     useEffect(() => {
         carregarTransacoes()
+        carregarContas()
+        carregarCategorias()
     }, [])
+
+    function findNomeCategoria(idCategoria) {
+        const categoria = categorias.find(categoria => categoria.id === idCategoria);
+
+        if(!categoria) return idCategoria
+
+        return categoria.nome;
+    }
+
+    function findNomeConta(idConta) {
+        const conta = contas.find(conta => conta.id === idConta);
+
+        if(!conta) return idConta
+
+        return conta.nome;
+    }
 
     async function carregarTransacoes() {
         const response = await apiFetch("/transacoes/byUser")
@@ -23,6 +43,26 @@ function Transacoes({setPropsInfoPopup}) {
         const data = await response.json();
 
         setTransacoes(data);
+    }
+
+    async function carregarContas() {
+        const response = await apiFetch("/contas/byUser")
+
+        if(!response) return
+
+        const data = await response.json();
+
+        setContas(data);
+    }
+
+    async function carregarCategorias() {
+        const response = await apiFetch("/categorias/byUser")
+        
+        if(!response) return
+
+        const data = await response.json();
+
+        setCategorias(data);
     }
 
     function fecharModalTransacao() {
@@ -49,15 +89,11 @@ function Transacoes({setPropsInfoPopup}) {
         carregarTransacoes();
     }
 
-    function formatarDinheiro(valor) {
-        const valorNumerico = Number(valor) / 100
-
-        const valorFormatado = new Intl.NumberFormat('pt-BR', {
-            style: 'currency',
-            currency: 'BRL',
-        }).format(valorNumerico)
-
-        return valorFormatado
+    function formatarDinheiroVindoApi(valor) {
+        return new Intl.NumberFormat("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+        }).format(Number(valor));
     }
 
     return (
@@ -95,11 +131,11 @@ function Transacoes({setPropsInfoPopup}) {
                     transacoes.map((transacao) => 
                         <tr>
                             <td>{transacao.descricao}</td>
-                            <td><span className="badge badge-${cl}">{transacao.tipoMovimentacao}</span></td>
-                            <td>{transacao.categoriaId}</td>
-                            <td>{transacao.contaId}</td>
+                            <td><span className={`badge badge-${transacao.tipoMovimentacao === 'Receita' ? 'receita' : 'despesa'}`}>{transacao.tipoMovimentacao}</span></td>
+                            <td>{findNomeCategoria(transacao.categoriaId)}</td>
+                            <td>{findNomeConta(transacao.contaId)}</td>
                             <td>{transacao.data}</td>
-                            <td><span class={`txn-val ${transacao.tipoMovimentacao === "Receita" ? 'receita' : 'despesa'}`}>{transacao.tipoMovimentacao === "Receita" ? '+' : '-' } {formatarDinheiro(transacao.valor)}</span></td>
+                            <td><span class={`txn-val ${transacao.tipoMovimentacao === "Receita" ? 'receita' : 'despesa'}`}>{transacao.tipoMovimentacao === "Receita" ? '+' : '-' } {formatarDinheiroVindoApi(transacao.valor)}</span></td>
                             <td>
                                 <div className="txn-actions">
                                 <button className="btn-icon" onclick="editTransacao(${t.id})">✏</button>
@@ -115,7 +151,7 @@ function Transacoes({setPropsInfoPopup}) {
         </section>
 
         <BackGroundModal isOpen={isBackGroundModalOpen}>
-            <ModalTransacao isOpen={isModalTransacaoOpen} onClose={fecharModalTransacao} onCreate={criarTransacao} setPropsInfoPopup={setPropsInfoPopup}/>
+            <ModalTransacao isOpen={isModalTransacaoOpen} onClose={fecharModalTransacao} onCreate={criarTransacao} setPropsInfoPopup={setPropsInfoPopup} categorias={categorias} contas={contas}/>
         </BackGroundModal>
         </>
     )
