@@ -83,31 +83,35 @@ function Login({setPropsInfoPopup}) {
             </div>
             <h1 className="auth-title">Bem-vindo de volta</h1>
             <p className="auth-sub">Acesse sua conta para continuar</p>
-            <div className="form-group">
-                <label>E-mail</label>
-                <input 
-                type="email" 
-                id="login-email" 
-                placeholder="seu@email.com"
-                onChange={(e) => setEmailInput(e.target.value)} 
-                value={emailInput}
-                />
-            </div>
-            <div className="form-group">
-                <label>Senha</label>
-                <div className="input-wrap">
-                <input 
-                type={isMostrarSenha ? "text" : "password"} 
-                id="login-senha" 
-                placeholder="••••••••" 
-                onChange={(e) => setSenhaInput(e.target.value)}
-                value={senhaInput}
-                />
-                <button className="eye-btn" onClick={() => setIsMostrarSenha((prevIsMostrarSenha) => !prevIsMostrarSenha)}>
-                    {isMostrarSenha ? "🙈" : "👁"} 
-                </button>
+            <form action="">
+                <div className="form-group">
+                    <label>E-mail</label>
+                    <input 
+                    type="email" 
+                    id="login-email" 
+                    placeholder="seu@email.com"
+                    onChange={(e) => setEmailInput(e.target.value)} 
+                    value={emailInput}
+                    autoComplete="username"
+                    />
                 </div>
-            </div>
+                <div className="form-group">
+                    <label>Senha</label>
+                    <div className="input-wrap">
+                    <input 
+                    type={isMostrarSenha ? "text" : "password"} 
+                    id="login-senha" 
+                    placeholder="••••••••" 
+                    onChange={(e) => setSenhaInput(e.target.value)}
+                    value={senhaInput}
+                    autoComplete="current-password"
+                    />
+                    <button className="eye-btn" onClick={() => setIsMostrarSenha((prevIsMostrarSenha) => !prevIsMostrarSenha)}>
+                        {isMostrarSenha ? "🙈" : "👁"} 
+                    </button>
+                    </div>
+                </div>
+            </form>
             <button 
             className="btn-primary full"
             onClick={() => autenticarUsuario()}

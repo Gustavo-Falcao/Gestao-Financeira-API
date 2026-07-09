@@ -91,51 +91,49 @@ function Cadastro({setPropsInfoPopup}) {
             </div>
             <h1 className="auth-title">Criar conta</h1>
             <p className="auth-sub">Comece a controlar suas finanças hoje</p>
-            <div className="form-group">
-                <label>Nome completo</label>
-                <input 
-                type="text" 
-                id="reg-nome" 
-                placeholder="João Silva"
-                value={nomeInptuCreate}
-                onChange={(e) => setNomeInptuCreate(e.target.value)}
-                />
-            </div>
-            <div className="form-group">
-                <label>E-mail</label>
-                <input 
-                type="email" 
-                id="reg-email" 
-                placeholder="seu@email.com" 
-                value={emailInputCreate}
-                onChange={(e) => setEmailInputCreate(e.target.value)}
-                />
-            </div>
-            <div className="form-group">
-                <label>Senha</label>
-                <div className="input-wrap">
-                <input 
-                type={isMostrarSenha ? "text" : "password"} 
-                id="reg-senha" 
-                placeholder="Min: 8 caracteres, 1 maiúscula e 1 número." 
-                value={senhaInputCreate}
-                onChange={(e) => setSenhaInputCreate(e.target.value)}
-                />
-                <button 
-                className="eye-btn" 
-                onClick={() => setIsMostrarSenha((prevIsMostrarSenha) => !prevIsMostrarSenha)}
-                >
-                    {isMostrarSenha ? "🙈" : "👁"}
-                </button>
+            <form action="">
+
+                <div className="form-group">
+                    <label>Nome completo</label>
+                    <input 
+                    type="text" 
+                    id="reg-nome" 
+                    placeholder="João Silva"
+                    value={nomeInptuCreate}
+                    onChange={(e) => setNomeInptuCreate(e.target.value)}
+                    />
                 </div>
-            </div>
-            {/* <div className="form-group">
-                <label>Perfil</label>
-                <select id="reg-role">
-                <option value="USER">Usuário</option>
-                <option value="ADMIN">Administrador</option>
-                </select>
-            </div> */}
+                <div className="form-group">
+                    <label>E-mail</label>
+                    <input 
+                    type="email" 
+                    id="reg-email" 
+                    placeholder="seu@email.com" 
+                    value={emailInputCreate}
+                    onChange={(e) => setEmailInputCreate(e.target.value)}
+                    autoComplete="username"
+                    />
+                </div>
+                <div className="form-group">
+                    <label>Senha</label>
+                    <div className="input-wrap">
+                    <input 
+                    type={isMostrarSenha ? "text" : "password"} 
+                    id="reg-senha" 
+                    placeholder="Min: 8 caracteres, 1 maiúscula e 1 número." 
+                    value={senhaInputCreate}
+                    onChange={(e) => setSenhaInputCreate(e.target.value)}
+                    autoComplete="new-password"
+                    />
+                    <button 
+                    className="eye-btn" 
+                    onClick={() => setIsMostrarSenha((prevIsMostrarSenha) => !prevIsMostrarSenha)}
+                    >
+                        {isMostrarSenha ? "🙈" : "👁"}
+                    </button>
+                    </div>
+                </div>
+            </form>
             <button 
             className="btn-primary full"
             onClick={cadastrarUsuario}

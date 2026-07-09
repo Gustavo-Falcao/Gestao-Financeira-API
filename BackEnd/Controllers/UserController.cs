@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using Gestao_Financeira.Exceptions;
 using Gestao_Financeira.Models.Dtos.UserDTOs;
-using Gestao_Financeira.Services.ProfileService;
+using Gestao_Financeira.Services.DashboardService;
 using Gestao_Financeira.Services.UserService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,12 +13,12 @@ namespace Gestao_Financeira.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly IProfileService _profileService;
+        private readonly IDashboardService _dashboardService;
 
-        public UserController(IUserService userService, IProfileService profileService)
+        public UserController(IUserService userService, IDashboardService dashboardService)
         {
             _userService = userService;
-            _profileService = profileService;
+            _dashboardService = dashboardService;
         }
 
         [Authorize]
@@ -32,12 +32,34 @@ namespace Gestao_Financeira.Controllers
                 if(string.IsNullOrWhiteSpace(userId))
                     return Unauthorized("Id do usuário não encontrado no token.");
 
-                var profile = _profileService.GetProfileById(userId);
+                var userSimpleInformation = _userService.GetById(userId);
             
-                if(profile == null)
+                if(userSimpleInformation == null)
                     return NotFound("Perfil não encontrado para o usuário autenticado.");
 
-                return Ok(profile);
+                return Ok(userSimpleInformation);
+            });
+        }
+
+        [Authorize]
+        [HttpGet("me/dashboard")]
+        public IActionResult GetDashBoard()
+        {
+            return ExecutarComTratamentoDeException(() =>
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if(string.IsNullOrWhiteSpace(userId))
+                    return Unauthorized("Id do usuário não encontrado no token.");
+
+                var userDashBoard = _dashboardService.GetDashboardByUserId(userId);
+
+                if(userDashBoard is null)
+                {
+                    return NotFound("Dashboard não encontrado para o usuário autenticado.");
+                }
+
+                return Ok(userDashBoard);
             });
         }
 
@@ -106,15 +128,6 @@ namespace Gestao_Financeira.Controllers
                     _userService.Delete(id);
                     return Ok("Removido com sucesso");
                 });
-        }
-
-        [HttpGet("{id}/perfil")]
-        public IActionResult GetProfileById(string id)
-        {
-            return ExecutarComTratamentoDeException(() =>
-            {
-                return Ok(_profileService.GetProfileById(id));
-            });
         }
 
         private IActionResult ExecutarComTratamentoDeException(Func<IActionResult> acao)

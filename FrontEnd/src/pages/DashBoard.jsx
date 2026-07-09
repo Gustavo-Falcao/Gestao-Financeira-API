@@ -1,29 +1,27 @@
 import { useEffect, useState, useRef } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useOutletContext } from "react-router-dom"
 import { apiHttpMethodHandler } from "../helpers/apiFetch" 
 
 function DashBoard() {
-    const API_PROFILE_URL = "http://localhost:5065/api/users/me"
+    const { userProfileData } = useOutletContext();
     const navigate = useNavigate()
-    const [userProfileData, setUserProfileData] = useState({})
+    const [dashboard, setDashboard] = useState({})
     const { apiFetch } = apiHttpMethodHandler();
     const firstName = userProfileData?.nome?.split(" ")[0] ?? ""
-
-    console.log("infos do usuário abaixo")
+    console.log("User profile abaixo")
     console.log(userProfileData)
-
     useEffect(() => {
-        carregarUsuario()
+        carregarDashboard()
     }, [])
 
-    async function carregarUsuario(params) {
-        const response = await apiFetch("/users/me")
+    async function carregarDashboard(params) {
+        const response = await apiFetch("/users/me/dashboard")
 
         if(!response) return;
 
         const data = await response.json();
 
-        setUserProfileData(data)
+        setDashboard(data)
     }
 
     function formatarDinheiroVindoApi(valor) {
@@ -36,28 +34,32 @@ function DashBoard() {
     return (
         <section id="tab-dashboard" className="tab active">
             <div className="page-header">
-            <h2 className="page-title">Dashboard</h2>
-            <p className="page-sub" id="dash-greeting">Olá {firstName}! Aqui está o resumo das suas finanças.</p>
+                <div>
+                    <h2 className="page-title">Dashboard</h2>
+                    <p className="page-sub" id="dash-greeting">
+                        Aqui está o resumo das suas finanças!
+                    </p>
+                </div>
             </div>
             <div className="kpi-grid" id="kpi-grid">
             <div className="kpi-card kpi-receita">
                 <div className="kpi-label">Total Receitas</div>
-                <div className="kpi-value" id="kpi-receita">{formatarDinheiroVindoApi(userProfileData.totalReceitas)}</div>
+                <div className="kpi-value" id="kpi-receita">{formatarDinheiroVindoApi(dashboard.totalReceitas)}</div>
                 <div className="kpi-badge">↑ ENTRADA</div>
             </div>
             <div className="kpi-card kpi-despesa">
                 <div className="kpi-label">Total Despesas</div>
-                <div className="kpi-value" id="kpi-despesa">{formatarDinheiroVindoApi(userProfileData.totalDespesas)}</div>
+                <div className="kpi-value" id="kpi-despesa">{formatarDinheiroVindoApi(dashboard.totalDespesas)}</div>
                 <div className="kpi-badge">↓ SAÍDA</div>
             </div>
             <div className="kpi-card kpi-saldo">
                 <div className="kpi-label">Saldo Geral</div>
-                <div className="kpi-value" id="kpi-saldo">{formatarDinheiroVindoApi(userProfileData.saldoTotal)}</div>
+                <div className="kpi-value" id="kpi-saldo">{formatarDinheiroVindoApi(dashboard.saldoTotal)}</div>
                 <div className="kpi-badge">◈ LÍQUIDO</div>
             </div>
             <div className="kpi-card kpi-contas">
                 <div className="kpi-label">Contas Ativas</div>
-                <div className="kpi-value" id="kpi-contas">{userProfileData?.contas?.length}</div>
+                <div className="kpi-value" id="kpi-contas">{dashboard?.contas?.length}</div>
                 <div className="kpi-badge">▣ CONTAS</div>
             </div>
             </div>
@@ -65,13 +67,16 @@ function DashBoard() {
                 <div className="dash-card">
                     <div className="dash-card-title">Transações Recentes</div>
                     <div id="dash-recent" className="txn-list-mini">
-                        {userProfileData?.transacoes?.length < 1 ?
+                        {dashboard?.transacoes?.length < 1 ?
                             <div className="empty-state" style={{padding: "24px 0"}}> 
                                 Nenhuma transação
                             </div>
                         :
-                           userProfileData?.transacoes?.map((transacao) => 
-                                <div className="txn-mini-item">
+                           dashboard?.transacoes?.map((transacao) => 
+                                <div 
+                                className="txn-mini-item"
+                                key={transacao.id}
+                                >
                                     <div className={`txn-mini-dot ${transacao.tipoMovimentacao === "Receita" ? 'receita' : 'despesa'}`} ></div>
                                     <div className="txn-mini-desc">{transacao.descricao}</div>
                                     <div className="txn-mini-date">{transacao.data}</div>
@@ -84,13 +89,16 @@ function DashBoard() {
                 <div className="dash-card">
                     <div className="dash-card-title">Contas</div>
                     <div id="dash-contas" className="contas-mini">
-                        {userProfileData?.contas?.length < 1 ?
+                        {dashboard?.contas?.length < 1 ?
                             <div className="empty-state" style={{padding: "24px 0"}}> 
                                 Nenhuma conta
                             </div>
                         :
-                            userProfileData?.contas?.map((conta) =>
-                                <div className="conta-mini-item">
+                            dashboard?.contas?.map((conta) =>
+                                <div 
+                                className="conta-mini-item"
+                                key={conta.id}
+                                >
                                     <div>
                                     <div className="conta-mini-nome">{conta.nome}</div>
                                     <div className="conta-mini-tipo">{conta.tipoConta}</div>

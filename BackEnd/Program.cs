@@ -8,7 +8,7 @@ using Gestao_Financeira.Repositories.UserRepository;
 using Gestao_Financeira.Services.AuthenticationService;
 using Gestao_Financeira.Services.CategoriaService;
 using Gestao_Financeira.Services.ContaService;
-using Gestao_Financeira.Services.ProfileService;
+using Gestao_Financeira.Services.DashboardService;
 using Gestao_Financeira.Services.TransacaoService;
 using Gestao_Financeira.Services.UserService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -57,7 +57,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IContaRepository, ContaRepository>();
 builder.Services.AddScoped<ITransacaoRepository, TransacaoRepository>();
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
-builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 
 builder.Services.AddCors(options =>

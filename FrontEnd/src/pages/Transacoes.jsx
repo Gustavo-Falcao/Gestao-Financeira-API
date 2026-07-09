@@ -135,7 +135,7 @@ function Transacoes({setPropsInfoPopup}) {
                             <td>{findNomeCategoria(transacao.categoriaId)}</td>
                             <td>{findNomeConta(transacao.contaId)}</td>
                             <td>{transacao.data}</td>
-                            <td><span class={`txn-val ${transacao.tipoMovimentacao === "Receita" ? 'receita' : 'despesa'}`}>{transacao.tipoMovimentacao === "Receita" ? '+' : '-' } {formatarDinheiroVindoApi(transacao.valor)}</span></td>
+                            <td><span className={`txn-val ${transacao.tipoMovimentacao === "Receita" ? 'receita' : 'despesa'}`}>{transacao.tipoMovimentacao === "Receita" ? '+' : '-' } {formatarDinheiroVindoApi(transacao.valor)}</span></td>
                             <td>
                                 <div className="txn-actions">
                                 <button className="btn-icon" onclick="editTransacao(${t.id})">✏</button>

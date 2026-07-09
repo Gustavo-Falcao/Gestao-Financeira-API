@@ -2,26 +2,11 @@ import { useState } from "react"
 import { NavLink, replace, useNavigate } from "react-router-dom"
 import { apiHttpMethodHandler } from "../helpers/apiFetch" 
 
-function SideBar() {
+function SideBar({ userProfile, isLoading }) {
     const navigate = useNavigate()
     const { apiFetch } = apiHttpMethodHandler();
-    const [simpleUserData, setSimpleUserData] = useState({})
-    const firstName = simpleUserData?.nome?.split(" ")[0] ?? ""
-    const letterFirstName = simpleUserData?.nome?.trim()[0] ?? ""
-
-    useState(() => {
-        carregarUsuario()
-    }, [])
-
-    async function carregarUsuario() {
-        const response = await apiFetch("/users/me/simple")
-
-        if(!response) return;
-
-        const data = await response.json();
-
-        setSimpleUserData(data)
-    }
+    const firstName = userProfile?.nome?.split(" ")[0] ?? ""
+    const letterFirstName = userProfile?.nome?.trim()[0] ?? ""
 
     function logout() {
         localStorage.removeItem('token') 
@@ -61,17 +46,30 @@ function SideBar() {
                 <NavLink 
                 to={"/administracao"}
                 className="sb-link admin-only"
-                style={{display: simpleUserData.userRole === "ADMIN" ? 'flex' : 'none'}}
+                style={{display: userProfile?.userRole === "ADMIN" ? 'flex' : 'none'}}
                 >
                     <span className="sb-icon">♛</span> Administração
                 </NavLink>
             </nav>
             <div className="sb-footer">
                 <div className="sb-user" role="button">
-                <div className="sb-avatar" id="sb-avatar">{letterFirstName}</div>
+                <div className={`sb-avatar ${isLoading && "skeleton skeleton-circle"}`}
+                id="sb-avatar">
+                    {letterFirstName}
+                </div>
                 <div>
-                    <div className="sb-uname" id="sb-uname">{firstName}</div>
-                    <div className="sb-urole" id="sb-urole">{simpleUserData.userRole}</div>
+                    <div 
+                    className={`sb-uname ${isLoading && "skeleton skeleton-md"}`} 
+                    id="sb-uname"
+                    >
+                        {firstName}
+                    </div>
+                    <div 
+                    className={`sb-urole ${isLoading && "skeleton skeleton-sm"}`} 
+                    id="sb-urole"
+                    >
+                        {userProfile?.userRole}
+                    </div>
                 </div>
                 </div>
                 <button 

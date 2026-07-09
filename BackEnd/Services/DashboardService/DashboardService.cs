@@ -9,16 +9,16 @@ using Gestao_Financeira.Repositories.ContaRepository;
 using Gestao_Financeira.Repositories.TransacaoRepository;
 using Gestao_Financeira.Repositories.UserRepository;
 
-namespace Gestao_Financeira.Services.ProfileService
+namespace Gestao_Financeira.Services.DashboardService
 {
-    public class ProfileService : IProfileService
+    public class DashboardService : IDashboardService
     {
         private readonly IUserRepository _userRepository;
         private readonly IContaRepository _contaRepository;
         private readonly ICategoriaRepository _categoriRepository;
         private readonly ITransacaoRepository _transacaoRepository;
 
-        public ProfileService(IUserRepository userRepository, IContaRepository contaRepository, ICategoriaRepository categoriaRepository, ITransacaoRepository transacaoRepository)
+        public DashboardService(IUserRepository userRepository, IContaRepository contaRepository, ICategoriaRepository categoriaRepository, ITransacaoRepository transacaoRepository)
         {
             _userRepository = userRepository;
             _contaRepository = contaRepository;
@@ -26,7 +26,7 @@ namespace Gestao_Financeira.Services.ProfileService
             _transacaoRepository = transacaoRepository;
         }
 
-        public UserProfileResponseDto GetProfileById(string id)
+        public UserDashboardDto GetDashboardByUserId(string id)
         {
             User user = _userRepository.GetById(id) ?? throw new NotFoundException("Usuário não encontrado");
 
@@ -81,12 +81,8 @@ namespace Gestao_Financeira.Services.ProfileService
 
             decimal saldoTotal = totalSaldoInicial + totalReceitas - totalDespesas;
 
-            return new UserProfileResponseDto
+            return new UserDashboardDto
             {
-                Id = user.Id,
-                Nome = user.Nome,
-                Email = user.Email,
-                UserRole = user.UserRole,
                 TotalReceitas = totalReceitas,
                 TotalDespesas = totalDespesas,
                 SaldoTotal = saldoTotal,
