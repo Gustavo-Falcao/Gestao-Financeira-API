@@ -35,13 +35,31 @@ namespace Gestao_Financeira.Services.DashboardService
             List<Transacao> transacoes = _transacaoRepository.GetByUsuarioId(id);
 
             List<ContaResponseDto> contasResponseDtos = contas
-                .Select(c => new ContaResponseDto
-                {
-                    Id = c.Id,
-                    Nome = c.Nome,
-                    TipoConta = c.TipoConta,
-                    SaldoInicial = c.SaldoInicial,
-                    UsuarioId = c.UsuarioId
+                .Select(c =>
+                {  
+                    var transacoesDaConta = transacoes
+                        .Where(t => t.ContaId == c.Id);
+
+                    var totalReceitas = transacoesDaConta
+                        .Where(t => t.TipoMovimentacao == TipoMovimentacao.Receita)
+                        .Sum(t => t.Valor);
+
+                    var totalDespesas = transacoesDaConta
+                        .Where(t => t.TipoMovimentacao == TipoMovimentacao.Despesa)
+                        .Sum(t => t.Valor);
+
+                    var saldoAtual = c.SaldoInicial + totalReceitas - totalDespesas;
+
+                    return new ContaResponseDto
+                    {
+                        Id = c.Id,
+                        Nome = c.Nome,
+                        TipoConta = c.TipoConta,
+                        SaldoInicial = c.SaldoInicial,
+                        SaldoAtual = saldoAtual,
+                        UsuarioId = c.UsuarioId
+                    };
+                    
                 })
                 .ToList();
 

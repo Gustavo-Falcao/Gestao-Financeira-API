@@ -3,6 +3,7 @@ using Gestao_Financeira.Models.Dtos.ContaDTOs;
 using Gestao_Financeira.Models.Entities;
 using Gestao_Financeira.Models.Enuns;
 using Gestao_Financeira.Repositories.ContaRepository;
+using Gestao_Financeira.Repositories.TransacaoRepository;
 using Gestao_Financeira.Repositories.UserRepository;
 using Gestao_Financeira.Services.UserService;
 
@@ -12,11 +13,13 @@ namespace Gestao_Financeira.Services.ContaService
     {
         private readonly IContaRepository _contaRepository;
         private readonly IUserRepository _userRepository;
+        private readonly ITransacaoRepository _transacaoRepository;
 
-        public ContaService(IContaRepository contaRepository, IUserRepository userRepository)
+        public ContaService(IContaRepository contaRepository, IUserRepository userRepository, ITransacaoRepository transacaoRepository)
         {
             _contaRepository = contaRepository;
             _userRepository = userRepository;
+            _transacaoRepository = transacaoRepository;
         }
 
         public List<ContaResponseDto> GetAll()
@@ -42,13 +45,31 @@ namespace Gestao_Financeira.Services.ContaService
         {
             return _contaRepository.GetAll()
                 .Where(c => c.UsuarioId == usuarioId)
-                .Select(c => new ContaResponseDto
+                .Select(c =>
                 {
-                    Id = c.Id,
-                    Nome = c.Nome,
-                    TipoConta = c.TipoConta,
-                    SaldoInicial = c.SaldoInicial,
-                    UsuarioId = c.UsuarioId
+                
+                    var transacoesDaConta = _transacaoRepository.GetAll().Where(t => t.ContaId == c.Id);
+
+                    var totalReceitas = transacoesDaConta
+                        .Where(t => t.TipoMovimentacao == TipoMovimentacao.Receita)
+                        .Sum(t => t.Valor);
+
+                    var totalDespesas = transacoesDaConta
+                        .Where(t => t.TipoMovimentacao == TipoMovimentacao.Despesa)
+                        .Sum(t => t.Valor);
+
+                    var saldoAtual = c.SaldoInicial + totalReceitas - totalDespesas;
+
+                    return new ContaResponseDto
+                    {
+                        Id = c.Id,
+                        Nome = c.Nome,
+                        TipoConta = c.TipoConta,
+                        SaldoInicial = c.SaldoInicial,
+                        SaldoAtual = saldoAtual,
+                        UsuarioId = c.UsuarioId
+                    };
+                    
                 })
                 .ToList();  
         }

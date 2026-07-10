@@ -8,8 +8,8 @@ function DashBoard() {
     const [dashboard, setDashboard] = useState({})
     const { apiFetch } = apiHttpMethodHandler();
     const firstName = userProfileData?.nome?.split(" ")[0] ?? ""
-    console.log("User profile abaixo")
-    console.log(userProfileData)
+    const [isLoading, setIsLoading] = useState(true)
+
     useEffect(() => {
         carregarDashboard()
     }, [])
@@ -22,6 +22,7 @@ function DashBoard() {
         const data = await response.json();
 
         setDashboard(data)
+        setIsLoading(false)
     }
 
     function formatarDinheiroVindoApi(valor) {
@@ -44,22 +45,42 @@ function DashBoard() {
             <div className="kpi-grid" id="kpi-grid">
             <div className="kpi-card kpi-receita">
                 <div className="kpi-label">Total Receitas</div>
-                <div className="kpi-value" id="kpi-receita">{formatarDinheiroVindoApi(dashboard.totalReceitas)}</div>
+                <div 
+                className={`kpi-value ${isLoading && "skeleton skeleton-xl"}`} 
+                id="kpi-receita"
+                >
+                    {formatarDinheiroVindoApi(dashboard.totalReceitas)}
+                </div>
                 <div className="kpi-badge">↑ ENTRADA</div>
             </div>
             <div className="kpi-card kpi-despesa">
                 <div className="kpi-label">Total Despesas</div>
-                <div className="kpi-value" id="kpi-despesa">{formatarDinheiroVindoApi(dashboard.totalDespesas)}</div>
+                <div 
+                className={`kpi-value ${isLoading && "skeleton skeleton-xl"}`} 
+                id="kpi-despesa"
+                >
+                    {formatarDinheiroVindoApi(dashboard.totalDespesas)}
+                </div>
                 <div className="kpi-badge">↓ SAÍDA</div>
             </div>
             <div className="kpi-card kpi-saldo">
                 <div className="kpi-label">Saldo Geral</div>
-                <div className="kpi-value" id="kpi-saldo">{formatarDinheiroVindoApi(dashboard.saldoTotal)}</div>
+                <div 
+                className={`kpi-value ${isLoading && "skeleton skeleton-xl"}`}
+                id="kpi-saldo"
+                 >
+                    {formatarDinheiroVindoApi(dashboard.saldoTotal)}
+                </div>
                 <div className="kpi-badge">◈ LÍQUIDO</div>
             </div>
             <div className="kpi-card kpi-contas">
                 <div className="kpi-label">Contas Ativas</div>
-                <div className="kpi-value" id="kpi-contas">{dashboard?.contas?.length}</div>
+                <div 
+                className={`kpi-value ${isLoading && "skeleton skeleton-xl"}`} 
+                id="kpi-contas"
+                >
+                    {dashboard?.contas?.length}
+                </div>
                 <div className="kpi-badge">▣ CONTAS</div>
             </div>
             </div>
@@ -67,12 +88,20 @@ function DashBoard() {
                 <div className="dash-card">
                     <div className="dash-card-title">Transações Recentes</div>
                     <div id="dash-recent" className="txn-list-mini">
-                        {dashboard?.transacoes?.length < 1 ?
-                            <div className="empty-state" style={{padding: "24px 0"}}> 
-                                Nenhuma transação
-                            </div>
-                        :
-                           dashboard?.transacoes?.map((transacao) => 
+                        {
+                            isLoading ?
+                                <div className="loading-block">
+                                    <div className="loading-block-spinner"></div>
+                                    <span className="loading-block-text">Carregando dados</span>
+                                    <div className="loading-block-bar"></div>
+                                </div>
+                            :
+                            dashboard?.transacoes?.length < 1 ?
+                                <div className="empty-state" style={{padding: "24px 0"}}> 
+                                    Nenhuma transação
+                                </div>
+                            :
+                            dashboard?.transacoes?.map((transacao) => 
                                 <div 
                                 className="txn-mini-item"
                                 key={transacao.id}
@@ -83,17 +112,25 @@ function DashBoard() {
                                     <div className={`txn-mini-val ${transacao.tipoMovimentacao === "Receita" ? 'receita' : 'despesa'}`}>{transacao.tipoMovimentacao === 'Receita' ? '+' : '-' }{formatarDinheiroVindoApi(transacao.valor)}</div>
                                 </div>
                             )
-                        }
+                        }    
                     </div>
                 </div>
                 <div className="dash-card">
                     <div className="dash-card-title">Contas</div>
                     <div id="dash-contas" className="contas-mini">
-                        {dashboard?.contas?.length < 1 ?
-                            <div className="empty-state" style={{padding: "24px 0"}}> 
-                                Nenhuma conta
-                            </div>
-                        :
+                        {
+                            isLoading ?
+                                <div className="loading-block">
+                                    <div className="loading-block-spinner"></div>
+                                    <span className="loading-block-text">Carregando dados</span>
+                                    <div className="loading-block-bar"></div>
+                                </div> 
+                            :
+                            dashboard?.contas?.length < 1 ?
+                                <div className="empty-state" style={{padding: "24px 0"}}> 
+                                    Nenhuma conta
+                                </div>
+                            :
                             dashboard?.contas?.map((conta) =>
                                 <div 
                                 className="conta-mini-item"
@@ -107,6 +144,7 @@ function DashBoard() {
                                 </div>
                             )
                         }
+                        
                     </div>
                 </div>
             </div>

@@ -86,26 +86,6 @@ function Contas({ setPropsInfoPopup }) {
         carregarContas()
     }
 
-    function handleEnumTipoConta(tipoContaNumero) {
-        const numeroTipoConta = Number(tipoContaNumero)
-        let enumString = ""
-
-        switch(numeroTipoConta) {
-            case 1: 
-                enumString = "Corrente"
-            break;
-            case 2: 
-                enumString = "Poupança";
-            break
-            case 3: 
-                enumString = "Carteira";
-            break
-            default: 
-                enumString = "";
-            break
-        }
-    }
-
     async function editarConta(requestEditConta) {
         const contaId = contaSerEditada.current.id
         const response = await apiFetch(`/contas/${contaId}`, {
@@ -146,10 +126,25 @@ function Contas({ setPropsInfoPopup }) {
                     contas.map((conta) => 
                         <div className="conta-card" key={conta.id}>
                             <div className="conta-card-glow"></div>
-                            <div className="conta-card-tipo">{handleEnumTipoConta(conta.tipoConta)}</div>
+                            <div className="conta-card-tipo">
+                               Conta {conta.tipoConta.toUpperCase()}
+                            </div>
                             <div className="conta-card-nome">{conta.nome}</div>
-                            <div className="conta-card-saldo-label">Saldo inicial</div>
-                            <div className="conta-card-saldo">{formatarDinheiroVindoApi(conta.saldoInicial)}</div>
+                            {/* <div className="conta-card-saldo-label">Saldo inicial</div>
+                            <div className="conta-card-saldo">{formatarDinheiroVindoApi(conta.saldoInicial)}</div> */}
+                            <div className="conta-card-saldos">
+                                <div className="conta-card-saldo-item">
+                                    <div className="conta-card-saldo-item-label">Saldo inicial</div>
+                                    <div className="conta-card-saldo-item-val inicial">saldo inicial</div>
+                                </div>
+                                <div className="conta-card-saldo-item">
+                                    <div className="conta-card-saldo-item-label">Saldo atual</div>
+                                    <div className="conta-card-saldo-item-val ${saldoAtualClass}">saldo atual valor</div>
+                                    <div className="conta-card-delta">
+                                        <span className="conta-card-delta-badge ${deltaClass}">quanto movimentou na conta</span>
+                                    </div>
+                                </div>
+                            </div>
                             <div className="conta-card-actions">
                                 <button className="btn-icon" onClick={() => {
                                     contaSerEditada.current = {
