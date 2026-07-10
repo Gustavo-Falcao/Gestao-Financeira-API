@@ -50,6 +50,8 @@ namespace Gestao_Financeira.Services.DashboardService
 
                     var saldoAtual = c.SaldoInicial + totalReceitas - totalDespesas;
 
+                    var movimentacao = saldoAtual == c.SaldoInicial ? 0 : saldoAtual - c.SaldoInicial;
+
                     return new ContaResponseDto
                     {
                         Id = c.Id,
@@ -57,6 +59,7 @@ namespace Gestao_Financeira.Services.DashboardService
                         TipoConta = c.TipoConta,
                         SaldoInicial = c.SaldoInicial,
                         SaldoAtual = saldoAtual,
+                        Movimentacao = movimentacao,
                         UsuarioId = c.UsuarioId
                     };
                     

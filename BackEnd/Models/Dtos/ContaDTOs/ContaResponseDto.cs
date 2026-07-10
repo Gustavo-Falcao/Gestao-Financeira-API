@@ -9,6 +9,7 @@ namespace Gestao_Financeira.Models.Dtos.ContaDTOs
         public TipoConta TipoConta { get; set; }
         public decimal SaldoInicial { get; set; }
         public decimal SaldoAtual { get; set; }
+        public decimal Movimentacao { get; set; }
         public string? UsuarioId { get; set; }
     }
 }

@@ -117,6 +117,15 @@ function Transacoes({setPropsInfoPopup}) {
         }).format(Number(valor));
     }
 
+    function formatarData(data) {
+        const dataSeparada = data.split("-")
+        const ano = dataSeparada[0]
+        const mes = dataSeparada[1]
+        const dia = dataSeparada[2]
+
+        return `${dia}/${mes}/${ano}`
+    }
+
     return (
         <>
         <section id="tab-transacoes" className="tab active">
@@ -177,11 +186,23 @@ function Transacoes({setPropsInfoPopup}) {
                     transacoesFiltradas.map((transacao) => 
                         <tr key={transacao.id}>
                             <td>{transacao.descricao}</td>
-                            <td><span className={`badge badge-${transacao.tipoMovimentacao === 'Receita' ? 'receita' : 'despesa'}`}>{transacao.tipoMovimentacao}</span></td>
+                            <td>
+                                <span 
+                                className={`badge badge-${transacao.tipoMovimentacao === 'Receita' ? 'receita' : 'despesa'}`}
+                                >
+                                    {transacao.tipoMovimentacao}
+                                </span>
+                            </td>
                             <td>{findNomeCategoria(transacao.categoriaId)}</td>
                             <td>{findNomeConta(transacao.contaId)}</td>
-                            <td>{transacao.data}</td>
-                            <td><span className={`txn-val ${transacao.tipoMovimentacao === "Receita" ? 'receita' : 'despesa'}`}>{transacao.tipoMovimentacao === "Receita" ? '+' : '-' } {formatarDinheiroVindoApi(transacao.valor)}</span></td>
+                            <td>{formatarData(transacao.data)}</td>
+                            <td>
+                                <span 
+                                className={`txn-val ${transacao.tipoMovimentacao === "Receita" ? 'receita' : 'despesa'}`}
+                                >
+                                    {transacao.tipoMovimentacao === "Receita" ? '+' : '-' } {formatarDinheiroVindoApi(transacao.valor)}
+                                </span>
+                            </td>
                             <td>
                                 <div className="txn-actions">
                                 <button className="btn-icon">✏</button>

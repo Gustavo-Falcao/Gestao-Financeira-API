@@ -130,18 +130,30 @@ function Contas({ setPropsInfoPopup }) {
                                Conta {conta.tipoConta.toUpperCase()}
                             </div>
                             <div className="conta-card-nome">{conta.nome}</div>
-                            {/* <div className="conta-card-saldo-label">Saldo inicial</div>
-                            <div className="conta-card-saldo">{formatarDinheiroVindoApi(conta.saldoInicial)}</div> */}
                             <div className="conta-card-saldos">
                                 <div className="conta-card-saldo-item">
                                     <div className="conta-card-saldo-item-label">Saldo inicial</div>
-                                    <div className="conta-card-saldo-item-val inicial">saldo inicial</div>
+                                    <div className="conta-card-saldo-item-val inicial">
+                                        {formatarDinheiroVindoApi(conta.saldoInicial)}
+                                    </div>
                                 </div>
                                 <div className="conta-card-saldo-item">
                                     <div className="conta-card-saldo-item-label">Saldo atual</div>
-                                    <div className="conta-card-saldo-item-val ${saldoAtualClass}">saldo atual valor</div>
+                                    <div className="conta-card-saldo-item-val positivo">
+                                        {formatarDinheiroVindoApi(conta.saldoAtual)}
+                                    </div>
                                     <div className="conta-card-delta">
-                                        <span className="conta-card-delta-badge ${deltaClass}">quanto movimentou na conta</span>
+                                        <span className={`conta-card-delta-badge ${conta.movimentacao > 0 ? "positivo" : conta.movimentacao < 0 ? "negativo" : "neutro"}`}>
+                                            {
+                                                conta.movimentacao > 0 ?
+                                                    `↑ ${formatarDinheiroVindoApi(conta.movimentacao)}`
+                                                :
+                                                conta.movimentacao < 0 ?
+                                                    `↓ ${formatarDinheiroVindoApi(conta.movimentacao * -1)}`
+                                                :
+                                                    "= sem movimentação"
+                                            }
+                                        </span>
                                     </div>
                                 </div>
                             </div>

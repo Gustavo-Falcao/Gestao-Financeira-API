@@ -5,16 +5,29 @@ import { apiHttpMethodHandler } from "../helpers/apiFetch";
 function ModalTransacao({ isOpen, onClose, onCreate, setPropsInfoPopup, categorias, contas }) {
     const { apiFetch } = apiHttpMethodHandler();
     const [inputDescricao, setInputDescricao] = useState("");
-    const [tipoTransacaoEscolhida, setTipoTransacaoEscolhida] = useState("1")
+    const [tipoTransacaoEscolhida, setTipoTransacaoEscolhida] = useState("")
     const [inputValorTransacao, setInputValorTransacao] = useState("")
     const [contaEscolhida, setContaEscolhida] = useState("")
     const [categoriaEscolhida, setCategoriaEscolhida] = useState("")
     const [inputData, setInputData] = useState("")
+    const categoriasFiltradas = filtrarCategoriasByTipoTransacao()
 
     console.log("Contas abaixo");
     console.log(contas)
     console.log("categorias abaixo")
     console.log(categorias)
+
+    function filtrarCategoriasByTipoTransacao() {
+        const tipoTransacao = tipoTransacaoEscolhida === "1" ? 
+        "Receita" : tipoTransacaoEscolhida === "2" ?
+        "Despesa" : "";
+
+        return categorias.filter(categoria => {
+            const filterByTipoTransacao = tipoTransacao === "" || categoria.tipoMovimentacao === tipoTransacao 
+
+            return filterByTipoTransacao
+        })
+    }
 
     function formatarDinheiro(valor) {
         const valorNumerico = Number(valor) / 100
@@ -121,9 +134,14 @@ function ModalTransacao({ isOpen, onClose, onCreate, setPropsInfoPopup, categori
             <div className="form-row">
             <div className="form-group">
                 <label>Tipo</label>
-                <select id="txn-tipo" value={tipoTransacaoEscolhida} onChange={(e) => setTipoTransacaoEscolhida(e.target.value)}>
-                <option value="1">Receita</option>
-                <option value="2">Despesa</option>
+                <select 
+                id="txn-tipo" 
+                value={tipoTransacaoEscolhida} 
+                onChange={(e) => setTipoTransacaoEscolhida(e.target.value)}
+                >
+                    <option value="">Tipo Transação</option>
+                    <option value="1">Receita</option>
+                    <option value="2">Despesa</option>
                 </select>
             </div>
             <div className="form-group">
@@ -150,7 +168,7 @@ function ModalTransacao({ isOpen, onClose, onCreate, setPropsInfoPopup, categori
             <div className="form-group">
                 <label>Conta</label>
                 <select id="txn-conta" value={contaEscolhida} onChange={(e) => setContaEscolhida(e.target.value)}>
-                    <option value={""}>conta</option>
+                    <option value="">conta</option>
                     {contas.map((conta) => 
                         <option key={conta.id} value={conta.id}>{conta.nome}</option>
                     )}
@@ -158,13 +176,17 @@ function ModalTransacao({ isOpen, onClose, onCreate, setPropsInfoPopup, categori
             </div>
             </div>
             <div className="form-group">
-            <label>Categoria</label>
-            <select id="txn-cat" value={categoriaEscolhida} onChange={(e) => setCategoriaEscolhida(e.target.value)}>
-                <option value={""}>categoria</option>
-                {categorias.map((categoria) => 
-                    <option key={categoria.id} value={categoria.id}>{categoria.nome}</option>
-                )}
-            </select>
+                <label>Categoria</label>
+                <select 
+                id="txn-cat" 
+                value={categoriaEscolhida} 
+                onChange={(e) => setCategoriaEscolhida(e.target.value)}
+                >
+                    <option value="">categoria</option>
+                    {categoriasFiltradas.map((categoria) => 
+                        <option key={categoria.id} value={categoria.id}>{categoria.nome}</option>
+                    )}
+                </select>
             </div>
         </div>
         <div className="modal-footer">

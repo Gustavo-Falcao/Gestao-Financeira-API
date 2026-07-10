@@ -32,6 +32,22 @@ function DashBoard() {
         }).format(Number(valor));
     }
 
+    function formatarData(data) {
+        const dataSeparada = data.split("-")
+        const ano = dataSeparada[0]
+        const mes = dataSeparada[1]
+        const dia = dataSeparada[2]
+
+        return `${dia}/${mes}/${ano}`
+    }
+
+    function calcularDiferencaEmPorcentagem(valorDiferenca, valorInicial) {
+        const valorPercentual = (valorDiferenca / valorInicial) * 100
+        return new Intl.NumberFormat('pt-BR', {
+            maximumFractionDigits: 2
+        }).format(valorPercentual)
+    }
+
     return (
         <section id="tab-dashboard" className="tab active">
             <div className="page-header">
@@ -108,7 +124,7 @@ function DashBoard() {
                                 >
                                     <div className={`txn-mini-dot ${transacao.tipoMovimentacao === "Receita" ? 'receita' : 'despesa'}`} ></div>
                                     <div className="txn-mini-desc">{transacao.descricao}</div>
-                                    <div className="txn-mini-date">{transacao.data}</div>
+                                    <div className="txn-mini-date">{formatarData(transacao.data)}</div>
                                     <div className={`txn-mini-val ${transacao.tipoMovimentacao === "Receita" ? 'receita' : 'despesa'}`}>{transacao.tipoMovimentacao === 'Receita' ? '+' : '-' }{formatarDinheiroVindoApi(transacao.valor)}</div>
                                 </div>
                             )
@@ -137,10 +153,25 @@ function DashBoard() {
                                 key={conta.id}
                                 >
                                     <div>
-                                    <div className="conta-mini-nome">{conta.nome}</div>
-                                    <div className="conta-mini-tipo">{conta.tipoConta}</div>
+                                        <div className="conta-mini-nome">{conta.nome}</div>
+                                        <div className="conta-mini-tipo">{conta.tipoConta}</div>
                                     </div>
-                                    <div className="conta-mini-saldo">{formatarDinheiroVindoApi(conta.saldoInicial)}</div>
+                                    <div style={{display: "flex", alignItems: "center", gap: "5px"}}>   
+                                        <span className={`conta-card-delta-badge ${conta.movimentacao > 0 ? "positivo" : conta.movimentacao < 0 ? "negativo" : "neutro"}`}>
+                                            {
+                                                conta.movimentacao > 0 ?
+                                                    `↑ ${calcularDiferencaEmPorcentagem(conta.movimentacao, conta.saldoInicial)} %`
+                                                :
+                                                conta.movimentacao < 0 ?
+                                                    `↓ ${calcularDiferencaEmPorcentagem(conta.movimentacao * -1, conta.saldoInicial)} %`
+                                                :
+                                                    "= sem movimentação"
+                                            }
+                                        </span>          
+                                        <div className="conta-mini-saldo">
+                                            {formatarDinheiroVindoApi(conta.saldoAtual)}
+                                        </div>
+                                    </div>
                                 </div>
                             )
                         }
