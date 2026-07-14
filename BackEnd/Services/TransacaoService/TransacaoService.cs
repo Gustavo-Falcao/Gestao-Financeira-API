@@ -89,12 +89,9 @@ namespace Gestao_Financeira.Services.TransacaoService
             if(!Enum.IsDefined(typeof(TipoMovimentacao), request.TipoMovimentacao))
                 throw new ValidationException("Tipode movimentação inválido");
 
-            if(request.Data.HasValue)
-            {
-                if(request.Data.Value > DateOnly.FromDateTime(DateTime.Today))
-                    throw new ValidationException("A data da transação não poder ser futura.");
-            }
-
+            if(request.Data > DateOnly.FromDateTime(DateTime.Today))
+                throw new ValidationException("A data da transação não poder ser futura.");
+            
             if(_userRepository.GetById(request.UsuarioId) is null)
                 throw new ValidationException("Usuário não encontrado");
 
@@ -114,7 +111,7 @@ namespace Gestao_Financeira.Services.TransacaoService
             var transacao = new Transacao(
                 request.Descricao.Trim(),
                 request.Valor,
-                request.Data!.Value,
+                request.Data,
                 request.TipoMovimentacao,
                 request.UsuarioId,
                 request.ContaId,

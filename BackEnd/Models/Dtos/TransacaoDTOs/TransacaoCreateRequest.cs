@@ -16,7 +16,7 @@ namespace Gestao_Financeira.Models.Dtos
         public TipoMovimentacao TipoMovimentacao { get; set; }
 
         [Required(ErrorMessage = "Data é obrigatória.")]
-        public DateOnly? Data { get; set; }
+        public DateOnly Data { get; set; }
 
         public string UsuarioId { get; set; } = string.Empty;
 

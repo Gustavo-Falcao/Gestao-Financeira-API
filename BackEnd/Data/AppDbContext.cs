@@ -17,7 +17,12 @@ namespace Gestao_Financeira.Data
             modelBuilder.Entity<User>()
                 .Property(u => u.UserRole)
                 .HasConversion<string>();
-        }
 
+            modelBuilder.Entity<Transacao>()
+                .HasOne<Categoria>()
+                .WithMany()
+                .HasForeignKey(transacao => transacao.CategoriaId)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
     }
 }

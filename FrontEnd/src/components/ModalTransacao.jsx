@@ -57,60 +57,62 @@ function ModalTransacao({ isOpen, onClose, onCreate, setPropsInfoPopup, categori
         setInputValorTransacao(formatarDinheiro(valorDigitado));
     }
 
-    function validarCampos(valorNumerico) {
+    function isCamposValidos(valorNumerico) {
         if(!inputDescricao) {
             setPropsInfoPopup({msg: "Descrição é obrigatório", type: "error", isOpen: true})
-            return
+            return false
         }
 
         if(inputDescricao.length < 2) {
             setPropsInfoPopup({msg: "Descição deve ter pelo menos 2 caracteres", type: "error", isOpen: true})
-            return
+            return false
         }
 
         if(valorNumerico < 1) {
             setPropsInfoPopup({msg: "Valor transação deve ser maior que 0", type: "error", isOpen: true})
-            return
+            return false
         }
 
         if(!tipoTransacaoEscolhida) {
             setPropsInfoPopup({msg: "Tipo da transação é obrigatório", type: "error", isOpen: true})
-            return
+            return false
         }
 
         if(!inputData) {
             setPropsInfoPopup({msg: "Data da tansação é obrigatório", type: "error", isOpen: true})
-            return
+            return false
         }
 
         if(!contaEscolhida) {
             setPropsInfoPopup({msg: "Conta é obrigatória", type: "error", isOpen: true})
-            return
+            return false
         }
 
         if(!categoriaEscolhida) {
             setPropsInfoPopup({msg: "Categoria é obrigatória", type: "error", isOpen: true})
-            return
+            return false
         }
 
+        return true
 
     }
 
     function handleCreate() {
         const valorNumerico = converterMoedaBRParaNumero(inputValorTransacao)
 
-        validarCampos(valorNumerico)
-
-        const transacaoCreateRequest = {
-            descricao: inputDescricao,
-            valor: valorNumerico,
-            tipoMovimentacao: Number(tipoTransacaoEscolhida),
-            data: inputData,
-            contaId: contaEscolhida,
-            categoriaId: categoriaEscolhida
+        if(isCamposValidos(valorNumerico)) {
+            const transacaoCreateRequest = {
+                descricao: inputDescricao,
+                valor: valorNumerico,
+                tipoMovimentacao: Number(tipoTransacaoEscolhida),
+                data: inputData,
+                contaId: contaEscolhida,
+                categoriaId: categoriaEscolhida
+            }
+    
+            onCreate(transacaoCreateRequest)
         }
-
-        onCreate(transacaoCreateRequest)
+        
     }
 
     return(
