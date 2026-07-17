@@ -112,7 +112,6 @@ function ModalTransacao({ isOpen, onClose, onCreate, setPropsInfoPopup, categori
     
             onCreate(transacaoCreateRequest)
         }
-        
     }
 
     return(

@@ -42,10 +42,16 @@ function DashBoard() {
     }
 
     function calcularDiferencaEmPorcentagem(valorDiferenca, valorInicial) {
-        const valorPercentual = (valorDiferenca / valorInicial) * 100
-        return new Intl.NumberFormat('pt-BR', {
-            maximumFractionDigits: 2
-        }).format(valorPercentual)
+        if(valorInicial === 0) {
+            if(valorDiferenca === 0) return "0"
+            if(valorDiferenca > 0) return "100"
+            return "100"
+        }else {
+            const valorPercentual = (valorDiferenca / valorInicial) * 100
+            return new Intl.NumberFormat('pt-BR', {
+                maximumFractionDigits: 2
+            }).format(valorPercentual)
+        }
     }
 
     return (
