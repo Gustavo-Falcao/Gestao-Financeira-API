@@ -3,6 +3,7 @@ using Gestao_Financeira.Models.Dtos;
 using Gestao_Financeira.Models.Entities;
 using Gestao_Financeira.Models.Enuns;
 using Gestao_Financeira.Repositories.CategoriaRepository;
+using Gestao_Financeira.Repositories.TransacaoRepository;
 using Gestao_Financeira.Repositories.UserRepository;
 using Gestao_Financeira.Services.UserService;
 
@@ -12,11 +13,13 @@ namespace Gestao_Financeira.Services.CategoriaService
     {
         private readonly ICategoriaRepository _repository;
         private readonly IUserRepository _userRepository;
+        private readonly ITransacaoRepository _transacaoRepository;
 
-        public CategoriaService(ICategoriaRepository repository, IUserRepository userRepository)
+        public CategoriaService(ICategoriaRepository repository, IUserRepository userRepository, ITransacaoRepository transacaoRepository)
         {
             _repository = repository;
             _userRepository = userRepository;
+            _transacaoRepository = transacaoRepository;
         }
 
         public List<CategoriaResponseDto> GetAll()
@@ -106,6 +109,12 @@ namespace Gestao_Financeira.Services.CategoriaService
         public void Delete(string id)
         {
             var categoria = GetByIdOrThrow(id);
+            
+            bool categoriaEmUso = _transacaoRepository.ExistsByCategoria(id);
+
+            if(categoriaEmUso)
+                throw new CategoriaEmUsoException();
+
             _repository.Delete(categoria);
         }
 

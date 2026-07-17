@@ -19,6 +19,7 @@ namespace Gestao_Financeira.Controllers
             _contaService = contaService;
         }
 
+        [Authorize(Roles = "ADMIN")]
         [HttpGet]
         public IActionResult Get()
         {

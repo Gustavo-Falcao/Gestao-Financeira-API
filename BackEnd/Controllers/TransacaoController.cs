@@ -18,6 +18,7 @@ namespace Gestao_Financeira.Controllers
             _service = service;
         }
 
+        [Authorize(Roles = "ADMIN")]
         [HttpGet]
         public IActionResult Get()
         {
@@ -25,15 +26,6 @@ namespace Gestao_Financeira.Controllers
            {
                 return Ok(_service.GetAll());
            });
-        }
-
-        [HttpGet("{id}")]
-        public IActionResult GetById(string id)
-        {
-            return ExecutarComTratamentoDeException(() =>
-            {
-                return Ok(_service.GetById(id));
-            });
         }
 
         [Authorize]

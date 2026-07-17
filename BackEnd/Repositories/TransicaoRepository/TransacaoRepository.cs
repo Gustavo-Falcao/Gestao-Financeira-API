@@ -45,5 +45,10 @@ namespace Gestao_Financeira.Repositories.TransacaoRepository
         {
             _context.SaveChanges();
         }
+
+        public bool ExistsByCategoria(string categoriaId)
+        {
+            return _context.Transacoes.Any(t => t.CategoriaId == categoriaId);
+        }
     }
 }

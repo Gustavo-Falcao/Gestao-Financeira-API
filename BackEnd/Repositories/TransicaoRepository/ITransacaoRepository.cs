@@ -10,5 +10,6 @@ namespace Gestao_Financeira.Repositories.TransacaoRepository
         void Add(Transacao transacao);
         void Delete(Transacao transacao);
         void Save();
+        bool ExistsByCategoria(string categoriaId);
     }
 }

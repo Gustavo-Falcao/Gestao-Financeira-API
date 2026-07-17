@@ -18,6 +18,7 @@ namespace Gestao_Financeira.Controllers
             _service = service;
         }
 
+        [Authorize(Roles = "ADMIN")]
         [HttpGet]
         public IActionResult Get()
         {
