@@ -63,23 +63,6 @@ namespace Gestao_Financeira.Controllers
             });
         }
 
-        [Authorize]
-        [HttpGet("me/simple")]
-        public IActionResult DebugMe()
-        {
-            return ExecutarComTratamentoDeException(() =>
-            {
-                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-                if(string.IsNullOrWhiteSpace(userId))
-                    return Unauthorized("Id do usuário não encontrado no token.");
-
-                var simpleProfile = _userService.GetById(userId);
-
-                return Ok(simpleProfile);
-            });
-        }
-
         [Authorize(Roles = "ADMIN")]
         [HttpGet]
         public IActionResult Get()
@@ -90,6 +73,7 @@ namespace Gestao_Financeira.Controllers
             });
         }
 
+        [Authorize(Roles = "ADMIN")]
         [HttpGet("{id}")]
         public IActionResult GetById(string id)
         {
@@ -120,6 +104,7 @@ namespace Gestao_Financeira.Controllers
             });
         }
 
+        [Authorize (Roles = "ADMIN")]
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {

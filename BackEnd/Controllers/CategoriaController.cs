@@ -28,6 +28,7 @@ namespace Gestao_Financeira.Controllers
             });
         }
 
+        [Authorize(Roles = "ADMIN")]
         [HttpGet("{id}")]
         public IActionResult GetById(string id)
         {
@@ -54,6 +55,7 @@ namespace Gestao_Financeira.Controllers
             });
         }
 
+        [Authorize]
         [HttpPost]
         public IActionResult Post(CategoriaCreateRequest request)
         {
@@ -63,8 +65,7 @@ namespace Gestao_Financeira.Controllers
 
                 if(string.IsNullOrWhiteSpace(userId))
                     return Unauthorized();
-
-                
+          
                 request.UsuarioId = userId;
                 CategoriaResponseDto categoriaResponseDto = _service.Add(request);
                 
@@ -72,11 +73,15 @@ namespace Gestao_Financeira.Controllers
             });
         }
 
-        [HttpPut("{id}")]
-        public IActionResult Put(CategoriaUpdateRequest request, string id)
+        [Authorize]
+        [HttpPatch("{id}")]
+        public IActionResult Patch(CategoriaUpdateRequest request, string id)
         {
             return ExecutarComTratamentoDeException(() =>
             {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+
                 _service.Update(request, id);
                 return Ok("Atualizado com sucesso");
             });
