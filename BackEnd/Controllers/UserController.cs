@@ -90,12 +90,13 @@ namespace Gestao_Financeira.Controllers
             return ExecutarComTratamentoDeException(() =>
             {
                 UserResponseDto userResponseDto = _userService.Add(userCreateRequest);
-                return Created($"api/users/{userResponseDto.Id}", userResponseDto);
+                return Created();
             });
         }
 
-        [HttpPut("{id}")]
-        public IActionResult Put(UserUpdateRequest userUpdateRequest, string id)
+        [Authorize]
+        [HttpPatch("{id}")]
+        public IActionResult Patch(UserUpdateRequest userUpdateRequest, string id)
         {
             return ExecutarComTratamentoDeException(() =>
             {

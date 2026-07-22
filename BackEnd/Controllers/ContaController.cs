@@ -29,6 +29,7 @@ namespace Gestao_Financeira.Controllers
             });
         }
 
+        [Authorize(Roles = "ADMIN")]
         [HttpGet("{id}")]
         public IActionResult GetById(string id)
         {
@@ -74,8 +75,8 @@ namespace Gestao_Financeira.Controllers
         }
 
         [Authorize]
-        [HttpPut("{id}")]
-        public IActionResult Put(ContaUpdateRequest request, string id)
+        [HttpPatch("{id}")]
+        public IActionResult Patch(ContaUpdateRequest request, string id)
         {
             return ExecutarComTratamentoDeException(() =>
             {
@@ -89,6 +90,7 @@ namespace Gestao_Financeira.Controllers
             });
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {

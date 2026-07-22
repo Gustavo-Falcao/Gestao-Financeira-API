@@ -64,8 +64,9 @@ namespace Gestao_Financeira.Controllers
             });
         }
 
-        [HttpPut("{id}")]
-        public IActionResult Put(TransacaoUpdateRequest request, string id)
+        [Authorize]
+        [HttpPatch("{id}")]
+        public IActionResult Patch(TransacaoUpdateRequest request, string id)
         {
             return ExecutarComTratamentoDeException(() =>
             {
@@ -74,6 +75,7 @@ namespace Gestao_Financeira.Controllers
             });            
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {

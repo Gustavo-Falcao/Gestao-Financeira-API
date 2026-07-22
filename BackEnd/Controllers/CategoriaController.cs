@@ -81,12 +81,12 @@ namespace Gestao_Financeira.Controllers
             {
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-
                 _service.Update(request, id);
                 return Ok("Atualizado com sucesso");
             });
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {
