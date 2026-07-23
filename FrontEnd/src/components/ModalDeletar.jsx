@@ -1,5 +1,4 @@
-function ModalDeletarConta({ isOpen, onCancelar, onExcluir }) {
-
+function ModalDeletar({ isOpen, onCancelar, onExcluir, nomeDeletar }) {
     if(!isOpen) return null
     
     return(
@@ -9,7 +8,7 @@ function ModalDeletarConta({ isOpen, onCancelar, onExcluir }) {
             <button className="modal-close" onClick={onCancelar}>✕</button>
         </div>
         <div className="modal-body">
-            <p id="confirm-msg">Tem certeza que deseja excluir este item?</p>
+            <p id="confirm-msg">Tem certeza que deseja excluir esta {nomeDeletar}?</p>
         </div>
         <div className="modal-footer">
             <button 
@@ -26,4 +25,4 @@ function ModalDeletarConta({ isOpen, onCancelar, onExcluir }) {
     )
 }
 
-export default ModalDeletarConta
+export default ModalDeletar

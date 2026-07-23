@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react"
 import { apiHttpMethodHandler } from "../helpers/apiFetch"
 import BackGroundModal from "../components/BackGroundModal.jsx";
 import ModalConta from "../components/ModalConta.jsx";
-import ModalDeletarConta from "../components/ModalDeletarConta.jsx";
+import ModalDeletar from "../components/ModalDeletar.jsx";
 import ModalEditarConta from "../components/ModalEditarConta.jsx";
 
 function Contas({ setPropsInfoPopup }) {
@@ -13,14 +13,15 @@ function Contas({ setPropsInfoPopup }) {
     const [isContaModalOpen, setIsContaModalOpen] = useState(false)
     const [isDeletarContaModalOpen, setIsDeletarContaModalOpen] = useState(false)
     const [isEditarContaModalOpen, setIsEditarContaModalOpen] = useState(false)
-    const contaSerEditada = useRef({id: "", nome: "", saldoInicial: "", tipoConta: ""});
+    const contaSerEditada = useRef(null);
+    const idContaSerDeletada = useRef(null);
 
     useEffect(() => {
         carregarContas()
     }, [])
 
     async function carregarContas() {
-        const response = await apiFetch("/contas/byUser")
+        const response = await apiFetch("/contas")
 
         if(!response) return
 
@@ -61,7 +62,7 @@ function Contas({ setPropsInfoPopup }) {
     
 
     async function excluirConta() {
-        const idConta = contaSerEditada.current.id;
+        const idConta = idContaSerDeletada.current;
         const response = await apiFetch(`/contas/${idConta}`, {
             method: "DELETE"
         })
@@ -102,6 +103,31 @@ function Contas({ setPropsInfoPopup }) {
         carregarContas()
     }
 
+    function actionsConta(e) {
+        const target = e.target
+
+        const cardElement = target.closest('.conta-card')
+
+        if(!cardElement) return
+
+        const contaId = cardElement.dataset.id
+
+        if(target.tagName === 'BUTTON') {
+            const actionType = target.dataset.action
+            if(actionType === "editar") {
+                const contaEncontrada = contas.find(c => c.id === contaId) ?? null
+                contaSerEditada.current = contaEncontrada
+                abrirModalEditarConta()
+            } 
+            
+            if(actionType === "deletar") {
+                idContaSerDeletada.current = contaId
+                abrirModalDeletarConta()
+            }
+            
+        }
+    }
+
     function formatarDinheiroVindoApi(valor) {
         return new Intl.NumberFormat("pt-BR", {
             style: "currency",
@@ -119,12 +145,12 @@ function Contas({ setPropsInfoPopup }) {
             </div>
             <button className="btn-primary" onClick={openModalConta}>+ Nova Conta</button>
             </div>
-            <div className="cards-grid" id="contas-grid">
+            <div className="cards-grid" id="contas-grid" onClick={actionsConta}>
                 {isContasEmpty ?
                     <div className="empty-state">Nenhuma conta cadastrada ainda.</div>
                 :
                     contas.map((conta) => 
-                        <div className="conta-card" key={conta.id}>
+                        <div className="conta-card" key={conta.id} data-id={conta.id}>
                             <div className="conta-card-glow"></div>
                             <div className="conta-card-tipo">
                                Conta {conta.tipoConta.toUpperCase()}
@@ -158,20 +184,12 @@ function Contas({ setPropsInfoPopup }) {
                                 </div>
                             </div>
                             <div className="conta-card-actions">
-                                <button className="btn-icon" onClick={() => {
-                                    contaSerEditada.current = {
-                                        id: conta.id,
-                                        nome: conta.nome,
-                                        saldoInicial: conta.saldoInicial,
-                                        tipoConta: conta.tipoConta
-                                    }
-
-                                    abrirModalEditarConta()
-                                }}>✏ Editar</button>
-                                <button className="btn-icon danger" onClick={() => {
-                                    contaSerEditada.current.id = conta.id
-                                    abrirModalDeletarConta()
-                                }}>✕</button>
+                                <button 
+                                className="btn-icon" 
+                                data-action="editar">✏ Editar</button>
+                                <button 
+                                className="btn-icon danger" 
+                                data-action="deletar">✕</button>
                             </div>
                         </div>
                     )
@@ -180,16 +198,26 @@ function Contas({ setPropsInfoPopup }) {
       </section>
 
       <BackGroundModal isOpen={isBackGroundModalOpen}>
-        <ModalConta 
+        <ModalConta
         isOpen={isContaModalOpen} 
         onClose={closeModalConta} 
         setPropsInfoPopup={setPropsInfoPopup}
         onCreate={criarConta}
         />
 
-        <ModalDeletarConta isOpen={isDeletarContaModalOpen} onCancelar={fecharModalDeletarConta} onExcluir={excluirConta}/>
+        <ModalDeletar 
+        isOpen={isDeletarContaModalOpen} 
+        onCancelar={fecharModalDeletarConta} 
+        onExcluir={excluirConta}
+        nomeDeletar={"conta"}
+        />
 
-        <ModalEditarConta isOpen={isEditarContaModalOpen} nomeConta={contaSerEditada.current.nome} saldoInicial={contaSerEditada.current.saldoInicial} tipoConta={contaSerEditada.current.tipoConta} onClose={fecharModalEditarConta} onSave={editarConta}/>
+        <ModalEditarConta 
+        isOpen={isEditarContaModalOpen} 
+        contaEditar={contaSerEditada.current}
+        onClose={fecharModalEditarConta} 
+        onSave={editarConta}
+        />
       </BackGroundModal>
       </>
     )

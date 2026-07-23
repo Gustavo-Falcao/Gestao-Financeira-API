@@ -29,11 +29,24 @@ namespace Gestao_Financeira.Services.UserService
             return usersResponseDtoList;
         }
 
-        public UserResponseDto GetById(string id)
+        public UserResponseDto GetUserById(string id)
         {
             var user = GetByIdOrElseThrowNotFoundException(id);
 
             return new UserResponseDto
+            {
+                Id = user.Id,
+                Nome = user.Nome,
+                Email = user.Email,
+                UserRole = user.UserRole
+            };
+        }
+
+        public UserProfileDto GetUserProfileById(string id)
+        {
+            var user = GetByIdOrElseThrowNotFoundException(id);
+
+            return new UserProfileDto
             {
                 Nome = user.Nome,
                 Email = user.Email,

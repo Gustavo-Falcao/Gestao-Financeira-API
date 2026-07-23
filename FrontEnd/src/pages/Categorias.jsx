@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import BackGroundModal from "../components/BackGroundModal"
 import ModalCategoria from "../components/ModalCategoria"
 import { apiHttpMethodHandler } from "../helpers/apiFetch"
+import ModalDeletar from "../components/ModalDeletar"
 
 function Categorias({setPropsInfoPopup}) {
     const { apiFetch } = apiHttpMethodHandler();
@@ -10,13 +11,14 @@ function Categorias({setPropsInfoPopup}) {
     const isCategoriasEmpty = categorias.length < 1;
     const [isBackGroundModalOpen, setIsBackGroundModalOpen] = useState(false)
     const [isCategoriaCreateModalOpen, setIsCategoriaCreateModalOpen] = useState(false)
+    const [isModalDeletarCategoriaOpen, setIsModalDeletarCategoriaOpen] = useState(false)
 
     useEffect(() => {
         carregarCategorias()
     }, [])
 
     async function carregarCategorias() {
-        const response = await apiFetch("/categorias/byUser")
+        const response = await apiFetch("/categorias")
 
         if(!response) return
 
@@ -49,6 +51,20 @@ function Categorias({setPropsInfoPopup}) {
         carregarCategorias()
     } 
 
+    function abrirModalDeletarCategoria() {
+        setIsModalDeletarCategoriaOpen(true)
+        setIsBackGroundModalOpen(true)
+    }
+
+    function fecharModalDeletarCategoria() {
+        setIsModalDeletarCategoriaOpen(false)
+        setIsBackGroundModalOpen(false)
+    }
+
+    function deletarCategoria() {
+        
+    }
+
     return (
         <>
         <section id="tab-categorias" className="tab active">
@@ -73,7 +89,10 @@ function Categorias({setPropsInfoPopup}) {
                                 </div>
                                 <div className="cat-actions">
                                     <button className="btn-icon" >✏</button>
-                                    <button className="btn-icon danger" >✕</button>
+                                    <button 
+                                    className="btn-icon danger" 
+                                    onClick={abrirModalDeletarCategoria}
+                                    >✕</button>
                                 </div>
                                 </div>
                         )
@@ -82,7 +101,18 @@ function Categorias({setPropsInfoPopup}) {
         </section>
         
         <BackGroundModal isOpen={isBackGroundModalOpen}>
-            <ModalCategoria isOpen={isCategoriaCreateModalOpen} onClose={fecharCreateCategoriaModal} onCreate={criarCategoria} setPropsInfoPopup={setPropsInfoPopup}/>
+            <ModalCategoria 
+            isOpen={isCategoriaCreateModalOpen} 
+            onClose={fecharCreateCategoriaModal} 
+            onCreate={criarCategoria} 
+            setPropsInfoPopup={setPropsInfoPopup}
+            />
+            <ModalDeletar 
+            isOpen={isModalDeletarCategoriaOpen}
+            onCancelar={fecharModalDeletarCategoria}
+            onExcluir={deletarCategoria}
+            nomeDeletar={"Categoria"}
+            />
         </BackGroundModal>
         
         </>

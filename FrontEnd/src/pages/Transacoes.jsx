@@ -3,6 +3,7 @@ import BackGroundModal from "../components/BackGroundModal.jsx";
 import ModalTransacao from "../components/ModalTransacao.jsx";
 import { apiHttpMethodHandler } from "../helpers/apiFetch.js";
 import { data } from "react-router-dom";
+import ModalDeletar from "../components/ModalDeletar.jsx";
 
 
 function Transacoes({setPropsInfoPopup}) {
@@ -10,6 +11,7 @@ function Transacoes({setPropsInfoPopup}) {
     const [transacoes, setTransacoes] = useState([])
     const [isBackGroundModalOpen, setIsBackGroundModalOpen] = useState(false)
     const [isModalTransacaoOpen, setIsModalTransacaoOpen] = useState(false)
+    const [isModalDeletarTransacaoOpen, setIsModalDeletarTransacaoOpen] = useState(false)
     const [categorias, setCategorias] = useState([])
     const [contas, setContas] = useState([])
     const [isTransacoesLoading, setIsTransacoesLoading] = useState(true)
@@ -55,7 +57,7 @@ function Transacoes({setPropsInfoPopup}) {
     }
 
     async function carregarTransacoes() {
-        const response = await apiFetch("/transacoes/byUser")
+        const response = await apiFetch("/transacoes")
 
         if(!response) return
 
@@ -66,7 +68,7 @@ function Transacoes({setPropsInfoPopup}) {
     }
 
     async function carregarContas() {
-        const response = await apiFetch("/contas/byUser")
+        const response = await apiFetch("/contas")
 
         if(!response) return
 
@@ -77,7 +79,7 @@ function Transacoes({setPropsInfoPopup}) {
     }
 
     async function carregarCategorias() {
-        const response = await apiFetch("/categorias/byUser")
+        const response = await apiFetch("/categorias")
         
         if(!response) return
 
@@ -94,6 +96,16 @@ function Transacoes({setPropsInfoPopup}) {
     function abriModalTransacao() {
         setIsModalTransacaoOpen(true)
         setIsBackGroundModalOpen(true)
+    }
+
+    function abrirModalDeletarTransacao() {
+        setIsModalDeletarTransacaoOpen(true)
+        setIsBackGroundModalOpen(true)
+    }
+
+    function fecharModalDeletarTransacao() {
+        setIsModalDeletarTransacaoOpen(false)
+        setIsBackGroundModalOpen(false)
     }
 
     async function criarTransacao(requestCreateTransacao) {
@@ -124,6 +136,10 @@ function Transacoes({setPropsInfoPopup}) {
         const dia = dataSeparada[2]
 
         return `${dia}/${mes}/${ano}`
+    }
+
+    function deletarTransacao() {
+
     }
 
     return (
@@ -206,7 +222,10 @@ function Transacoes({setPropsInfoPopup}) {
                             <td>
                                 <div className="txn-actions">
                                 <button className="btn-icon">✏</button>
-                                <button className="btn-icon danger">✕</button>
+                                <button 
+                                className="btn-icon danger"
+                                onClick={abrirModalDeletarTransacao}
+                                >✕</button>
                                 </div>
                             </td>
                         </tr>
@@ -218,7 +237,20 @@ function Transacoes({setPropsInfoPopup}) {
         </section>
 
         <BackGroundModal isOpen={isBackGroundModalOpen}>
-            <ModalTransacao isOpen={isModalTransacaoOpen} onClose={fecharModalTransacao} onCreate={criarTransacao} setPropsInfoPopup={setPropsInfoPopup} categorias={categorias} contas={contas}/>
+            <ModalTransacao 
+            isOpen={isModalTransacaoOpen} 
+            onClose={fecharModalTransacao} 
+            onCreate={criarTransacao} 
+            setPropsInfoPopup={setPropsInfoPopup} 
+            categorias={categorias} 
+            contas={contas}
+            />
+            <ModalDeletar 
+            isOpen={isModalDeletarTransacaoOpen}
+            onCancelar={fecharModalDeletarTransacao}
+            onExcluir={deletarTransacao}
+            nomeDeletar={"Transação"}
+            />
         </BackGroundModal>
         </>
     )

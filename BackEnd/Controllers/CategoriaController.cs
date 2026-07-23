@@ -18,28 +18,8 @@ namespace Gestao_Financeira.Controllers
             _service = service;
         }
 
-        [Authorize(Roles = "ADMIN")]
-        [HttpGet]
-        public IActionResult Get()
-        {
-            return ExecutarComTratamentoDeException(() =>
-            {
-                return Ok(_service.GetAll());
-            });
-        }
-
-        [Authorize(Roles = "ADMIN")]
-        [HttpGet("{id}")]
-        public IActionResult GetById(string id)
-        {
-            return ExecutarComTratamentoDeException(() =>
-            {
-                return Ok(_service.GetById(id));
-            });
-        }
-
         [Authorize]
-        [HttpGet("byUser")]
+        [HttpGet]
         public IActionResult GetByUserLogado()
         {
             return ExecutarComTratamentoDeException(() =>
@@ -105,6 +85,9 @@ namespace Gestao_Financeira.Controllers
             } catch (NotFoundException e)
             {
                 return NotFound(new {message = e.Message});
+            } catch (CategoriaEmUsoException e)
+            {
+                return Conflict(new {message = e.Message});  
             } catch (ValidationException e)
             {
                 return BadRequest(new {message = e.Message});

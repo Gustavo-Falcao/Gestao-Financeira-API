@@ -18,18 +18,8 @@ namespace Gestao_Financeira.Controllers
             _service = service;
         }
 
-        [Authorize(Roles = "ADMIN")]
-        [HttpGet]
-        public IActionResult Get()
-        {
-           return ExecutarComTratamentoDeException(() =>
-           {
-                return Ok(_service.GetAll());
-           });
-        }
-
         [Authorize]
-        [HttpGet("byUser")]
+        [HttpGet]
         public IActionResult GetByUserLogado()
         {
             return ExecutarComTratamentoDeException(() =>

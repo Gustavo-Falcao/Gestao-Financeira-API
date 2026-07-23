@@ -114,6 +114,8 @@ function ModalTransacao({ isOpen, onClose, onCreate, setPropsInfoPopup, categori
         }
     }
 
+    if(!isOpen) return null
+
     return(
         <div className="modal">
         <div className="modal-header">

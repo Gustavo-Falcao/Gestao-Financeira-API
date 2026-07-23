@@ -32,7 +32,7 @@ namespace Gestao_Financeira.Controllers
                 if(string.IsNullOrWhiteSpace(userId))
                     return Unauthorized("Id do usuário não encontrado no token.");
 
-                var userSimpleInformation = _userService.GetById(userId);
+                var userSimpleInformation = _userService.GetUserProfileById(userId);
             
                 if(userSimpleInformation == null)
                     return NotFound("Perfil não encontrado para o usuário autenticado.");
@@ -63,27 +63,6 @@ namespace Gestao_Financeira.Controllers
             });
         }
 
-        [Authorize(Roles = "ADMIN")]
-        [HttpGet]
-        public IActionResult Get()
-        {
-            return ExecutarComTratamentoDeException(() =>
-            {
-                return Ok(_userService.GetAll());
-            });
-        }
-
-        [Authorize(Roles = "ADMIN")]
-        [HttpGet("{id}")]
-        public IActionResult GetById(string id)
-        {
-            return ExecutarComTratamentoDeException(() =>
-            {
-                var user = _userService.GetById(id);
-                return Ok(user);
-            });
-        }
-
         [HttpPost]
         public IActionResult Post(UserCreateRequest userCreateRequest)
         {
@@ -95,25 +74,19 @@ namespace Gestao_Financeira.Controllers
         }
 
         [Authorize]
-        [HttpPatch("{id}")]
-        public IActionResult Patch(UserUpdateRequest userUpdateRequest, string id)
+        [HttpPatch("me")]
+        public IActionResult Patch(UserUpdateRequest userUpdateRequest)
         {
             return ExecutarComTratamentoDeException(() =>
             {
-                _userService.Update(userUpdateRequest, id);
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if(string.IsNullOrWhiteSpace(userId))
+                    return Unauthorized("Id do usuário não encontrado no token.");
+
+                _userService.Update(userUpdateRequest, userId);
                 return Ok("Atualizado com sucesso"); 
             });
-        }
-
-        [Authorize (Roles = "ADMIN")]
-        [HttpDelete("{id}")]
-        public IActionResult Delete(string id)
-        {
-            return ExecutarComTratamentoDeException(() =>
-                {
-                    _userService.Delete(id);
-                    return Ok("Removido com sucesso");
-                });
         }
 
         private IActionResult ExecutarComTratamentoDeException(Func<IActionResult> acao)

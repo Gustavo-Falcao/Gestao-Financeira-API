@@ -1,14 +1,14 @@
 import { useState } from "react"
 
-function ModalEditarConta({ isOpen, nomeConta, saldoInicial, tipoConta, onClose, onSave }) {
-    const [nomeContaInput, setNomeContaInput] = useState(nomeConta)
+function ModalEditarConta({ isOpen, contaEditar, onClose, onSave }) {
+    const [nomeContaInput, setNomeContaInput] = useState(contaEditar.nome)
     const [saldoIncialInput, setSaldoIncialInput] = useState(() => {
-        let valorString = saldoInicial.toString().replace(/\D/g,"");
+        let valorString = contaEditar.saldoInicial.toString().replace(/\D/g,"");
         
         return formatarDinheiroVindoApi(valorString);
 
     })
-    const [tipoContaEscolhido, setTipoContaEscolhido] = useState(tipoConta)
+    const [tipoContaEscolhido, setTipoContaEscolhido] = useState(contaEditar.tipoConta)
 
     if(!isOpen) return null
 

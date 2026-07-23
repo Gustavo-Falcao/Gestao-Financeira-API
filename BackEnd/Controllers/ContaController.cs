@@ -19,28 +19,8 @@ namespace Gestao_Financeira.Controllers
             _contaService = contaService;
         }
 
-        [Authorize(Roles = "ADMIN")]
-        [HttpGet]
-        public IActionResult Get()
-        {
-            return ExecutarComTratamentoDeException(() =>
-            {
-                return Ok(_contaService.GetAll()); 
-            });
-        }
-
-        [Authorize(Roles = "ADMIN")]
-        [HttpGet("{id}")]
-        public IActionResult GetById(string id)
-        {
-            return ExecutarComTratamentoDeException(() =>
-            {
-                return Ok(_contaService.GetById(id));
-            });
-        }
-
         [Authorize]
-        [HttpGet("byUser")]
+        [HttpGet]
         public IActionResult GetByUserLogado()
         {
             return ExecutarComTratamentoDeException(() =>
