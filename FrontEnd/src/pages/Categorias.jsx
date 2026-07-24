@@ -79,6 +79,7 @@ function Categorias({setPropsInfoPopup}) {
         }
 
         if(response.status === 200) {
+            carregarCategorias()
             setPropsInfoPopup({msg: "Categoria deletada com sucesso!", type: "success", isOpen: true})
         }
 
