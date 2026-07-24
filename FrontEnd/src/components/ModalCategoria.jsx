@@ -1,12 +1,12 @@
 import { useState } from "react"
 
-function ModalCategoria({ isOpen, onClose, onCreate, setPropsInfoPopup }) {
-    
-    const [inputNomeCategoria, setInputNomeCategoria] = useState("")
-    const [inputTipoMovimentacaoEscolhida, setInputTipoMovimentacaoEscolhida] = useState("")
-
+function ModalCategoria({ isOpen, onClose, onSubmit, setPropsInfoPopup, modeModal, categoriaToEdit }) {
     if(!isOpen) return null
+    
+    const [inputNomeCategoria, setInputNomeCategoria] = useState(categoriaToEdit?.nome ?? "")
+    const [inputTipoMovimentacaoEscolhida, setInputTipoMovimentacaoEscolhida] = useState(categoriaToEdit?.tipoMovimentacao ?? "")
 
+    
     function validacaoEntradas() {
         if(!inputNomeCategoria) {
             setPropsInfoPopup({msg: "Nome é obrigatório", type: "error", isOpen: true})
@@ -19,16 +19,24 @@ function ModalCategoria({ isOpen, onClose, onCreate, setPropsInfoPopup }) {
         }
     }
 
-    function handleCreateCategoria() {
+    function handleSubmitCategoria() {
         
         validacaoEntradas()
 
+        let tipoMovimentacao = ""
+
+        if(inputTipoMovimentacaoEscolhida === "Receita")
+            tipoMovimentacao = "1"
+
+        if(inputTipoMovimentacaoEscolhida === "Despesa")
+            tipoMovimentacao = "2"
+
         const requestCreateCategoria = {
             nome: inputNomeCategoria,
-            tipoMovimentacao: Number(inputTipoMovimentacaoEscolhida)
+            tipoMovimentacao: Number(tipoMovimentacao) ?? 0
         }
 
-        onCreate(requestCreateCategoria);
+        onSubmit(requestCreateCategoria);
     }
     
     return(
@@ -56,14 +64,15 @@ function ModalCategoria({ isOpen, onClose, onCreate, setPropsInfoPopup }) {
                 value={inputTipoMovimentacaoEscolhida}
                 onChange={(e) => setInputTipoMovimentacaoEscolhida(e.target.value)}
                 >
-                    <option value="1">Receita</option>
-                    <option value="2">Despesa</option>
+                    <option value="" hidden>Movimentacao</option>
+                    <option value="Receita">Receita</option>
+                    <option value="Despesa">Despesa</option>
                 </select>
                 </div>
             </div>
             <div className="modal-footer">
                 <button className="btn-ghost" onClick={onClose}>Cancelar</button>
-                <button className="btn-primary" onClick={handleCreateCategoria}>Salvar</button>
+                <button className="btn-primary" onClick={handleSubmitCategoria}>Salvar</button>
             </div>
         </div>
     )

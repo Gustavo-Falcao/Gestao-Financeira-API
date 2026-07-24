@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import BackGroundModal from "../components/BackGroundModal"
 import ModalCategoria from "../components/ModalCategoria"
 import { apiHttpMethodHandler } from "../helpers/apiFetch"
@@ -10,8 +10,11 @@ function Categorias({setPropsInfoPopup}) {
     const [categorias, setCategorias] = useState([])
     const isCategoriasEmpty = categorias.length < 1;
     const [isBackGroundModalOpen, setIsBackGroundModalOpen] = useState(false)
-    const [isCategoriaCreateModalOpen, setIsCategoriaCreateModalOpen] = useState(false)
+    const [isCategoriaModalOpen, setIsCategoriaModalOpen] = useState(false)
     const [isModalDeletarCategoriaOpen, setIsModalDeletarCategoriaOpen] = useState(false)
+    const categoriaSerEditada = useRef(null)
+    const idCategoriaSerDeletada = useRef(null)
+    const modeModalCategoria = useRef(null)
 
     useEffect(() => {
         carregarCategorias()
@@ -27,15 +30,24 @@ function Categorias({setPropsInfoPopup}) {
         setCategorias(data);
     }
 
-    function abrirCreateCategoriaModal() {
-        setIsCategoriaCreateModalOpen(true)
+    function abrirModalCategoriaToCreate() {
+        setIsCategoriaModalOpen(true)
         setIsBackGroundModalOpen(true)
+        modeModalCategoria.current = "create"
     }
     
-    function fecharCreateCategoriaModal() {
-        setIsCategoriaCreateModalOpen(false)
+    function fecharModalCategoria() {
+        setIsCategoriaModalOpen(false)
         setIsBackGroundModalOpen(false)
+        modeModalCategoria.current = null   
     }
+
+    function abrirModalCategoriaToEdit() {
+        setIsCategoriaModalOpen(true)
+        setIsBackGroundModalOpen(true)
+        modeModalCategoria.current = "edit"
+    }
+    
 
     async function criarCategoria(categoriaCreateRequest) {
         const response = await apiFetch("/categorias", {
@@ -47,9 +59,32 @@ function Categorias({setPropsInfoPopup}) {
 
         setPropsInfoPopup({msg: "Categoria criada com sucesso", type: "success", isOpen: true})
 
-        fecharCreateCategoriaModal()
+        fecharModalCategoria()
         carregarCategorias()
     } 
+
+    async function editarCategoria(categoriaEditRequest) {
+        
+    }
+
+    async function deletarCategoria() {
+        const idCategoriaToDelete = idCategoriaSerDeletada.current
+        const response = await apiFetch(`/categorias/${idCategoriaToDelete}`, {
+            method: "DELETE"
+        })
+
+        if(response.status === 409) {
+            const data = await response.json()
+            setPropsInfoPopup({msg: data.message, type: "error", isOpen: true})
+        }
+
+        if(response.status === 200) {
+            setPropsInfoPopup({msg: "Categoria deletada com sucesso!", type: "success", isOpen: true})
+        }
+
+        fecharModalDeletarCategoria()
+        
+    }
 
     function abrirModalDeletarCategoria() {
         setIsModalDeletarCategoriaOpen(true)
@@ -61,8 +96,30 @@ function Categorias({setPropsInfoPopup}) {
         setIsBackGroundModalOpen(false)
     }
 
-    function deletarCategoria() {
-        
+
+    function actionsCategoria(e) {
+        const target = e.target
+
+        const cardElement = target.closest('.cat-card')
+
+        if(!cardElement) return
+
+        const categoriaId = cardElement.dataset.id
+
+        if(target.tagName === 'BUTTON') {
+            const actionType = target.dataset.action
+            if(actionType === "editar") {
+                const categoriaEncontrada = categorias.find(c => c.id === categoriaId) ?? null
+                categoriaSerEditada.current = categoriaEncontrada
+                abrirModalCategoriaToEdit()
+            } 
+            
+            if(actionType === "deletar") {
+                idCategoriaSerDeletada.current = categoriaId
+                
+                abrirModalDeletarCategoria()
+            }
+        }
     }
 
     return (
@@ -73,14 +130,14 @@ function Categorias({setPropsInfoPopup}) {
                     <h2 className="page-title">Categorias</h2>
                     <p className="page-sub">Organize suas transações por categoria</p>
                 </div>
-                <button className="btn-primary" onClick={abrirCreateCategoriaModal}>+ Nova Categoria</button>
+                <button className="btn-primary" onClick={abrirModalCategoriaToCreate}>+ Nova Categoria</button>
             </div>
-                <div className="cat-grid" id="cat-grid">
+                <div className="cat-grid" id="cat-grid" onClick={actionsCategoria}>
                     {isCategoriasEmpty ?
                         <div className="empty-state">Nenhuma categoria cadastrada ainda.</div>
                     :
                         categorias.map((categoria) => 
-                                <div className="cat-card" key={categoria.id}>
+                                <div className="cat-card" data-id={categoria.id} key={categoria.id}>
                                 <div className="cat-info">
                                     <div className="cat-nome">{categoria.nome}</div>
                                     <span className={`cat-tipo-badge ${categoria.tipoMovimentacao === "Receita" ? 'receita' : 'despesa'}`}>
@@ -88,10 +145,13 @@ function Categorias({setPropsInfoPopup}) {
                                     </span>
                                 </div>
                                 <div className="cat-actions">
-                                    <button className="btn-icon" >✏</button>
+                                    <button 
+                                    className="btn-icon" 
+                                    data-action="editar"
+                                    >✏</button>
                                     <button 
                                     className="btn-icon danger" 
-                                    onClick={abrirModalDeletarCategoria}
+                                    data-action="deletar"
                                     >✕</button>
                                 </div>
                                 </div>
@@ -102,10 +162,11 @@ function Categorias({setPropsInfoPopup}) {
         
         <BackGroundModal isOpen={isBackGroundModalOpen}>
             <ModalCategoria 
-            isOpen={isCategoriaCreateModalOpen} 
-            onClose={fecharCreateCategoriaModal} 
-            onCreate={criarCategoria} 
+            isOpen={isCategoriaModalOpen}
+            onClose={fecharModalCategoria} 
+            onSubmit={modeModalCategoria.current === "edit" ? editarCategoria :  criarCategoria} 
             setPropsInfoPopup={setPropsInfoPopup}
+            categoriaToEdit={categoriaSerEditada.current}
             />
             <ModalDeletar 
             isOpen={isModalDeletarCategoriaOpen}

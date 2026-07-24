@@ -1,6 +1,8 @@
 import { useState } from "react"
 
 function ModalEditarConta({ isOpen, contaEditar, onClose, onSave }) {
+    if(!isOpen) return null
+    
     const [nomeContaInput, setNomeContaInput] = useState(contaEditar.nome)
     const [saldoIncialInput, setSaldoIncialInput] = useState(() => {
         let valorString = contaEditar.saldoInicial.toString().replace(/\D/g,"");
@@ -9,8 +11,6 @@ function ModalEditarConta({ isOpen, contaEditar, onClose, onSave }) {
 
     })
     const [tipoContaEscolhido, setTipoContaEscolhido] = useState(contaEditar.tipoConta)
-
-    if(!isOpen) return null
 
     console.log(nomeContaInput)
     console.log(saldoIncialInput)
