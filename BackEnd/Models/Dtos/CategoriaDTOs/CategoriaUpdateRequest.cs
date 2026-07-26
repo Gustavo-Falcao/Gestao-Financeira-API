@@ -5,7 +5,8 @@ namespace Gestao_Financeira.Models.Dtos
 {
     public class CategoriaUpdateRequest
     {
-        [StringLength(100, MinimumLength = 2, ErrorMessage = "Nome deve ter entre 2 e 100 caracteres.")]
-        public string? Nome { get; set; } = string.Empty;
+        // [StringLength(100, MinimumLength = 2, ErrorMessage = "Nome deve ter entre 2 e 100 caracteres.")]
+        public string? Nome { get; set; }
+        public TipoMovimentacao? TipoMovimentacao { get; set;}
     }
 }

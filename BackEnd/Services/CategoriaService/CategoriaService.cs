@@ -6,6 +6,7 @@ using Gestao_Financeira.Repositories.CategoriaRepository;
 using Gestao_Financeira.Repositories.TransacaoRepository;
 using Gestao_Financeira.Repositories.UserRepository;
 using Gestao_Financeira.Services.UserService;
+using Microsoft.VisualBasic;
 
 namespace Gestao_Financeira.Services.CategoriaService
 {
@@ -100,8 +101,37 @@ namespace Gestao_Financeira.Services.CategoriaService
         {
             var categoria = GetByIdOrThrow(id);
 
-            if(!string.IsNullOrWhiteSpace(request.Nome)) 
-                categoria.AlterarNome(request.Nome.Trim());
+            if(request.Nome is not null)
+            {
+                var nome = request.Nome.Trim();
+
+                if(string.IsNullOrWhiteSpace(nome))
+                {
+                    throw new ValidationException("Nome da categoria não pode estar vazio");
+                }    
+
+                if(nome.Length < 2 || nome.Length > 100)
+                {
+                    throw new ValidationException("Nome deve ter entre 2 e 100 caracteres");
+                }
+
+                categoria.AlterarNome(request.Nome);
+            }
+
+            if(request.TipoMovimentacao is TipoMovimentacao tipoMovimentacao)
+            {
+                bool categoriaEmUso = _transacaoRepository.ExistsByCategoria(id);
+
+                if(categoriaEmUso)
+                    throw new CategoriaEmUsoException("Não é possível alterar tipo movimentação de uma categoria já utilizada em transação.");
+
+                if(!Enum.IsDefined(tipoMovimentacao))
+                {
+                    throw new ValidationException("Tipo de movimentação inválido.");
+                }
+
+                categoria.AlterarTipoMovimentacao(tipoMovimentacao);
+            }
 
             _repository.Save();
         }
@@ -113,7 +143,7 @@ namespace Gestao_Financeira.Services.CategoriaService
             bool categoriaEmUso = _transacaoRepository.ExistsByCategoria(id);
 
             if(categoriaEmUso)
-                throw new CategoriaEmUsoException();
+                throw new CategoriaEmUsoException("Não é possível deletar uma categoria já utilizada em transação.");
 
             _repository.Delete(categoria);
         }

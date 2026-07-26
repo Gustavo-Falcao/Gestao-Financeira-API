@@ -7,7 +7,7 @@ function ModalCategoria({ isOpen, onClose, onSubmit, setPropsInfoPopup, modeModa
     const [inputTipoMovimentacaoEscolhida, setInputTipoMovimentacaoEscolhida] = useState(categoriaToEdit?.tipoMovimentacao ?? "")
 
     
-    function validacaoEntradas() {
+    function validacaoEntradasCreate() {
         if(!inputNomeCategoria) {
             setPropsInfoPopup({msg: "Nome é obrigatório", type: "error", isOpen: true})
             return
@@ -20,9 +20,20 @@ function ModalCategoria({ isOpen, onClose, onSubmit, setPropsInfoPopup, modeModa
     }
 
     function handleSubmitCategoria() {
-        
-        validacaoEntradas()
-
+        if(modeModal === "create") {
+            submitCreate()
+        }
+        else if(modeModal === "edit") {
+            submitEdit()
+        }
+        else {
+            return
+        }   
+    }
+    
+    function submitCreate() {
+        validacaoEntradasCreate()
+    
         let tipoMovimentacao = ""
 
         if(inputTipoMovimentacaoEscolhida === "Receita")
@@ -36,9 +47,22 @@ function ModalCategoria({ isOpen, onClose, onSubmit, setPropsInfoPopup, modeModa
             tipoMovimentacao: Number(tipoMovimentacao) ?? 0
         }
 
-        onSubmit(requestCreateCategoria);
+        console.log("Submit enviará request para criar categoria, objeto abaixo:")
+        console.log(requestCreateCategoria)
+        //onSubmit(requestCreateCategoria);
     }
-    
+
+    function submitEdit() {
+
+        let editRequest = {}
+
+        //para adicionar atributo no objeto request
+            //o valor da categoria ser editada deve ser diferente da atual mas não uma string vazia
+
+
+        console.log("Submit enviará request para editar categoria, objeto abaixo:")
+    }
+
     return(
         <div className="modal">
             <div className="modal-header">
