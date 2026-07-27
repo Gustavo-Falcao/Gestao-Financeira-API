@@ -59,6 +59,14 @@ function ModalCategoria({ isOpen, onClose, onSubmit, setPropsInfoPopup, modeModa
         //para adicionar atributo no objeto request
             //o valor da categoria ser editada deve ser diferente da atual mas não uma string vazia
 
+        if(inputNomeCategoria.length < 2 || inputNomeCategoria.length > 100) {
+            //informar alerta sobre tamanho necessário para ser inserido
+            return
+        }
+        if(categoriaToEdit.nome !== inputNomeCategoria) {
+            //inserir campo de nome no objeto
+        }
+        
 
         console.log("Submit enviará request para editar categoria, objeto abaixo:")
     }
