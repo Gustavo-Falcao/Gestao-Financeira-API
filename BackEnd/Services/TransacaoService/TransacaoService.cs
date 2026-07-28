@@ -92,19 +92,21 @@ namespace Gestao_Financeira.Services.TransacaoService
             if(request.Data > DateOnly.FromDateTime(DateTime.Today))
                 throw new ValidationException("A data da transação não poder ser futura.");
             
-            if(_userRepository.GetById(request.UsuarioId) is null)
-                throw new ValidationException("Usuário não encontrado");
+            var isUserValido = _userRepository.ExistsById(request.UsuarioId);
 
-            var conta = _contaRepository.GetById(request.ContaId) ?? throw new ValidationException("Conta não encontrada");
-            
-            var categoria = _categoriaRepository.GetById(request.CategoriaId) ?? throw new ValidationException("Categoria não encontrada");
-        
-            if(conta.UsuarioId != request.UsuarioId)
-                throw new ValidationException("A conta informada não pertence ao usuário.");
+            if(!isUserValido)
+                throw new NotFoundException("Usuário não encontrado.");
+
+            var isContaValida = _contaRepository.ExistsByIdAndUserId(request.ContaId, request.UsuarioId);
+
+            if(!isContaValida)
+                throw new NotFoundException("Conta não encontrada.");
+
+            var categoria = _categoriaRepository.GetById(request.CategoriaId) ?? throw new NotFoundException("Categoria não encontrada.");
 
             if(categoria.UsuarioId != request.UsuarioId)
-                throw new ValidationException("A categoria informada não pertence ao usuário.");
-
+                throw new NotFoundException("Categoria não encontrada.");
+        
             if(categoria.TipoMovimentacao != request.TipoMovimentacao)
                 throw new ValidationException("O tipo de movimentação da transação não corresponde ao tipo da categoria.");
 
@@ -133,17 +135,31 @@ namespace Gestao_Financeira.Services.TransacaoService
             };
         }
 
-        public void Update(TransacaoUpdateRequest request, string id)
+        public void Update(TransacaoUpdateRequest request, string id, string userId)
         {
             var t = GetByIdOrThrow(id);
 
-            if(!string.IsNullOrWhiteSpace(request.Descricao))
-                t.AlterarDescricao(request.Descricao);
+            if(request.Descricao is not null)
+            {
+                var descricao = request.Descricao.Trim();
+
+                if(string.IsNullOrWhiteSpace(descricao))
+                {
+                    throw new ValidationException("Descrição da transação não pode ser vazia.");
+                }
+
+                if(descricao.Length < 2 || descricao.Length > 100)
+                {
+                    throw new ValidationException("Descrição deve ter entre 2 e 100 caracteres.");
+                }
+
+                t.AlterarDescricao(descricao);
+            }
 
             if(request.Valor.HasValue)
             {
                 if(request.Valor.Value <= 0)
-                    throw new ValidationException("Valor deve ser maior que zero");
+                    throw new ValidationException("Valor da transação deve ser maior que zero.");
 
                 t.AlterarValor(request.Valor.Value);
             }
@@ -156,21 +172,41 @@ namespace Gestao_Financeira.Services.TransacaoService
                 t.AlterarData(request.Data.Value);
             }
 
-            if(!string.IsNullOrWhiteSpace(request.ContaId))
+            if(request.ContaId is not null)
             {
-                if(_contaRepository.GetById(request.ContaId) is null) 
-                    throw new ValidationException("Conta não foi encontrada");
-                t.AlterarContaId(request.ContaId);
+                var idConta = request.ContaId.Trim();
+
+                if(string.IsNullOrWhiteSpace(idConta))
+                {
+                    throw new ValidationException("O id da conta não pode ser vazio.");
+                }
+
+                var isContaValida = _contaRepository.ExistsByIdAndUserId(idConta, userId);
+
+                if(!isContaValida)
+                    throw new NotFoundException("Conta não encontrada!");
+
+                t.AlterarContaId(idConta);
             }
 
-            if(!string.IsNullOrWhiteSpace(request.CategoriaId))
+            if(request.CategoriaId is not null)
             {
-                var categoria = _categoriaRepository.GetById(request.CategoriaId) ?? throw new ValidationException("Categoria não encontrada");
+                var categoriaId = request.CategoriaId.Trim();
 
-                if(categoria.TipoMovimentacao != t.TipoMovimentacao) 
-                    throw new ValidationException("O tipo de movimentação da transação não corresponde ao tipo da categoria.");
+                if(string.IsNullOrWhiteSpace(categoriaId))
+                {
+                    throw new ValidationException("O id da categoria não pode ser vazio.");
+                }
 
-                t.AlterarCategoriaId(categoria.Id);
+                var categoria = _categoriaRepository.GetById(categoriaId) ?? throw new NotFoundException("Categoria não encontrada.");
+
+                if(categoria.UsuarioId != userId)
+                    throw new NotFoundException("Categoria não encontrada.");
+
+                if(categoria.TipoMovimentacao != t.TipoMovimentacao)
+                    throw new ValidationException("Categoria escolhida não corresponde ao tipo da transação.");
+
+                t.AlterarCategoriaId(categoriaId);
             }
 
             _transacaoRepository.Save();

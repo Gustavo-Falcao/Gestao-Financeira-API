@@ -24,9 +24,9 @@ namespace Gestao_Financeira.Repositories.CategoriaRepository
                 .ToList();
         }
 
-        public Categoria? FindByIdAndUsuarioId(string contaId, string usuarioId)
+        public bool ExistsByIdAndUsuarioId(string contaId, string usuarioId)
         {
-            return _context.Categorias.FirstOrDefault(conta =>
+            return _context.Categorias.Any(conta =>
                 conta.Id == contaId && conta.UsuarioId == usuarioId
             );
         }

@@ -5,18 +5,24 @@ function ModalCategoria({ isOpen, onClose, onSubmit, setPropsInfoPopup, modeModa
     
     const [inputNomeCategoria, setInputNomeCategoria] = useState(categoriaToEdit?.nome ?? "")
     const [inputTipoMovimentacaoEscolhida, setInputTipoMovimentacaoEscolhida] = useState(categoriaToEdit?.tipoMovimentacao ?? "")
-
     
-    function validacaoEntradasCreate() {
+    function isEntradasCreateValidas() {
         if(!inputNomeCategoria) {
             setPropsInfoPopup({msg: "Nome é obrigatório", type: "error", isOpen: true})
-            return
+            return false
         }
 
         if(inputNomeCategoria.length < 2) {
             setPropsInfoPopup({msg: "Nome deve ter pelo menos 2 letras", type: "error", isOpen: true})
-            return
+            return false
         }
+
+        if(!inputTipoMovimentacaoEscolhida || !inputTipoMovimentacaoEscolhida.length) {
+            setPropsInfoPopup({msg: "Tipo movimentação é obrigatório!", type: "error", isOpen: true})
+            return false
+        }
+
+        return true
     }
 
     function handleSubmitCategoria() {
@@ -31,44 +37,47 @@ function ModalCategoria({ isOpen, onClose, onSubmit, setPropsInfoPopup, modeModa
         }   
     }
     
+    function convertTipoMovimentacaoStringToEnum(tipoMovimentacaoString) {
+        return tipoMovimentacaoString === "Receita" ? "1" : tipoMovimentacaoString === "Despesa" ? "2" : "0"
+    }
+
     function submitCreate() {
-        validacaoEntradasCreate()
+        if(!isEntradasCreateValidas()) return
     
-        let tipoMovimentacao = ""
-
-        if(inputTipoMovimentacaoEscolhida === "Receita")
-            tipoMovimentacao = "1"
-
-        if(inputTipoMovimentacaoEscolhida === "Despesa")
-            tipoMovimentacao = "2"
+        const tipoMovimentacao = convertTipoMovimentacaoStringToEnum(inputTipoMovimentacaoEscolhida)
 
         const requestCreateCategoria = {
             nome: inputNomeCategoria,
             tipoMovimentacao: Number(tipoMovimentacao) ?? 0
         }
 
-        console.log("Submit enviará request para criar categoria, objeto abaixo:")
-        console.log(requestCreateCategoria)
-        //onSubmit(requestCreateCategoria);
+        onSubmit(requestCreateCategoria);
     }
+
 
     function submitEdit() {
 
         let editRequest = {}
+        let changes = false
 
-        //para adicionar atributo no objeto request
-            //o valor da categoria ser editada deve ser diferente da atual mas não uma string vazia
-
-        if(inputNomeCategoria.length < 2 || inputNomeCategoria.length > 100) {
-            //informar alerta sobre tamanho necessário para ser inserido
-            return
+        if(inputNomeCategoria !== categoriaToEdit.nome) {
+            editRequest = {...editRequest, nome: inputNomeCategoria}
+            changes = true
         }
-        if(categoriaToEdit.nome !== inputNomeCategoria) {
-            //inserir campo de nome no objeto
+
+        if(inputTipoMovimentacaoEscolhida !== categoriaToEdit.tipoMovimentacao) {
+            const tipoMovimentacaoEnum = convertTipoMovimentacaoStringToEnum(inputTipoMovimentacaoEscolhida)
+            editRequest = {...editRequest, tipoMovimentacao: tipoMovimentacaoEnum}
+            changes = true
         }
         
+        if(changes) {
+            onSubmit(editRequest)
+        }
+        else {
+            onClose()
+        }
 
-        console.log("Submit enviará request para editar categoria, objeto abaixo:")
     }
 
     return(

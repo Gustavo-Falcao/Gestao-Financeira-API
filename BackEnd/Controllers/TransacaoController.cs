@@ -60,7 +60,12 @@ namespace Gestao_Financeira.Controllers
         {
             return ExecutarComTratamentoDeException(() =>
             {
-                _service.Update(request, id);
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if(string.IsNullOrWhiteSpace(userId))
+                    return Unauthorized();
+
+                _service.Update(request, id, userId);
                 return Ok("Atualizado com sucesso");
             });            
         }

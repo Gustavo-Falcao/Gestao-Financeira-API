@@ -12,11 +12,6 @@ function ModalTransacao({ isOpen, onClose, onCreate, setPropsInfoPopup, categori
     const [inputData, setInputData] = useState("")
     const categoriasFiltradas = filtrarCategoriasByTipoTransacao()
 
-    console.log("Contas abaixo");
-    console.log(contas)
-    console.log("categorias abaixo")
-    console.log(categorias)
-
     function filtrarCategoriasByTipoTransacao() {
         const tipoTransacao = tipoTransacaoEscolhida === "1" ? 
         "Receita" : tipoTransacaoEscolhida === "2" ?

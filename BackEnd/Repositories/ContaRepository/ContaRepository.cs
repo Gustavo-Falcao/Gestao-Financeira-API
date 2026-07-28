@@ -29,6 +29,11 @@ namespace Gestao_Financeira.Repositories.ContaRepository
             return _context.Contas.Find(id);
         }
 
+        public bool ExistsByIdAndUserId(string id, string userId)
+        {
+            return _context.Contas.Any(c => c.Id == id && c.UsuarioId == userId);
+        }
+
         public void Add(Conta conta)
         {
             _context.Contas.Add(conta);

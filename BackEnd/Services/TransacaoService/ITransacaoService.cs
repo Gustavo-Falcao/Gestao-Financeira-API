@@ -8,7 +8,7 @@ namespace Gestao_Financeira.Services.TransacaoService
         List<TransacaoResponseDto> GetByUsuarioId(string usuarioId);
         TransacaoResponseDto GetById(string id);
         TransacaoResponseDto Add(TransacaoCreateRequest request);
-        void Update(TransacaoUpdateRequest request, string id);
+        void Update(TransacaoUpdateRequest request, string id, string userId);
         void Delete(string id);
     }
 }

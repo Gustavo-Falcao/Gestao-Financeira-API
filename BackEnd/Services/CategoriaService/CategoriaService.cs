@@ -120,15 +120,15 @@ namespace Gestao_Financeira.Services.CategoriaService
 
             if(request.TipoMovimentacao is TipoMovimentacao tipoMovimentacao)
             {
-                bool categoriaEmUso = _transacaoRepository.ExistsByCategoria(id);
-
-                if(categoriaEmUso)
-                    throw new CategoriaEmUsoException("Não é possível alterar tipo movimentação de uma categoria já utilizada em transação.");
-
                 if(!Enum.IsDefined(tipoMovimentacao))
                 {
                     throw new ValidationException("Tipo de movimentação inválido.");
                 }
+
+                bool categoriaEmUso = _transacaoRepository.ExistsByCategoria(id);
+
+                if(categoriaEmUso)
+                    throw new CategoriaEmUsoException("Não é possível alterar tipo movimentação de uma categoria já utilizada em transação.");
 
                 categoria.AlterarTipoMovimentacao(tipoMovimentacao);
             }

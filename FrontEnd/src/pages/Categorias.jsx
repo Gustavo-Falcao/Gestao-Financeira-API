@@ -39,7 +39,8 @@ function Categorias({setPropsInfoPopup}) {
     function fecharModalCategoria() {
         setIsCategoriaModalOpen(false)
         setIsBackGroundModalOpen(false)
-        modeModalCategoria.current = null   
+        modeModalCategoria.current = null  
+        categoriaSerEditada.current = null 
     }
 
     function abrirModalCategoriaToEdit() {
@@ -57,14 +58,51 @@ function Categorias({setPropsInfoPopup}) {
 
         if(!response) return
 
-        setPropsInfoPopup({msg: "Categoria criada com sucesso", type: "success", isOpen: true})
+        if(response.status === 400) {
+            const data = await response.json()
+            setPropsInfoPopup({msg: data.message, type: "error", isOpen: true})
+        }
+
+        if(response.status === 201) {
+            setPropsInfoPopup({msg: "Categoria criada com sucesso", type: "success", isOpen: true})
+        }
 
         fecharModalCategoria()
         carregarCategorias()
     } 
 
     async function editarCategoria(categoriaEditRequest) {
-        
+        const idCategoria = categoriaSerEditada.current.id
+        const response = await apiFetch(`/categorias/${idCategoria}`, {
+            method: "PATCH",
+            body: JSON.stringify(categoriaEditRequest)
+        })
+
+        if(!response) return
+
+        //bad request
+        if(response.status === 400) {
+            const data = await response.json()
+            setPropsInfoPopup({msg: data.message, type: "error", isOpen: true})
+        }
+
+        //not found
+        if(response.status === 404) {
+            setPropsInfoPopup({msg: "Categoria não encontrada!", type: "error", isOpen: true})
+        }
+
+        //conflict
+        if(response.status === 409) {
+            const data = await response.json()
+            setPropsInfoPopup({msg: data.message, type: "error", isOpen: true})
+        }
+
+        if(response.status === 200) {
+            setPropsInfoPopup({msg: "Categoria editada com sucesso!", type: "success", isOpen: true})
+        }
+
+        fecharModalCategoria()
+        carregarCategorias()
     }
 
     async function deletarCategoria() {
@@ -167,6 +205,7 @@ function Categorias({setPropsInfoPopup}) {
             onClose={fecharModalCategoria} 
             onSubmit={modeModalCategoria.current === "edit" ? editarCategoria :  criarCategoria} 
             setPropsInfoPopup={setPropsInfoPopup}
+            modeModal={modeModalCategoria.current}
             categoriaToEdit={categoriaSerEditada.current}
             />
             <ModalDeletar 

@@ -4,7 +4,6 @@ namespace Gestao_Financeira.Models.Dtos
 {
     public class TransacaoUpdateRequest
     {
-        [StringLength(100, MinimumLength = 2, ErrorMessage = "Descrição deve ter entre 2 e 100 caracteres.")]
         public string? Descricao { get; set; } 
         
         public decimal? Valor { get; set; }

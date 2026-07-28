@@ -27,6 +27,11 @@ namespace Gestao_Financeira.Repositories.UserRepository
             return _context.Users.FirstOrDefault(user => user.Email == email);
         }
 
+        public bool ExistsById(string id)
+        {
+            return _context.Users.Any(u => u.Id == id);
+        }
+
         public User Add(User user)
         {
             _context.Users.Add(user);

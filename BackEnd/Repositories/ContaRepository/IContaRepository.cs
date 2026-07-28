@@ -7,6 +7,7 @@ namespace Gestao_Financeira.Repositories.ContaRepository
         List<Conta> GetAll();
         List<Conta> GetByUsuarioId(string usuarioId);
         Conta? GetById(string id);
+        bool ExistsByIdAndUserId(string id, string userId);
         void Add(Conta conta);
         void Save();
         void Delete(Conta conta);

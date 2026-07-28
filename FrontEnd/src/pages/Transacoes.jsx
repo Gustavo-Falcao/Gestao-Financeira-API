@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from "react"
+import { use, useEffect, useRef, useState } from "react"
 import BackGroundModal from "../components/BackGroundModal.jsx";
 import ModalTransacao from "../components/ModalTransacao.jsx";
 import { apiHttpMethodHandler } from "../helpers/apiFetch.js";
@@ -21,6 +21,9 @@ function Transacoes({setPropsInfoPopup}) {
     const [dataMesFiltro, setDataMesFiltro] = useState("")
     const transacoesFiltradas = getTransacoesFiltradas()
     const isTransacoesEmpty = transacoesFiltradas.length === 0;
+    const modeModalTransacao = useRef(null)
+    const idTransacaoDeletar = useRef(null)
+    const transacaoSerEditada = useRef(null)
 
     useEffect(() => {
         carregarTransacoes()
@@ -106,6 +109,7 @@ function Transacoes({setPropsInfoPopup}) {
     function fecharModalDeletarTransacao() {
         setIsModalDeletarTransacaoOpen(false)
         setIsBackGroundModalOpen(false)
+        idTransacaoDeletar.current = null
     }
 
     async function criarTransacao(requestCreateTransacao) {
@@ -138,8 +142,48 @@ function Transacoes({setPropsInfoPopup}) {
         return `${dia}/${mes}/${ano}`
     }
 
-    function deletarTransacao() {
+    async function deletarTransacao() {
+        const idTransacao = idTransacaoDeletar.current
+        const response = await apiFetch(`/transacoes/${idTransacao}`, {
+            method: "DELETE"
+        })
+        
+        if(!response) return
 
+        if(response.status === 404) {
+            const data = await response.json()
+            setPropsInfoPopup({msg: data.message, type: "error", isOpen: true})
+        }
+
+        if(response.status === 200) {
+            setPropsInfoPopup({msg: "Transação deletada com sucesso!", type: "success", isOpen: true})
+        }
+
+        fecharModalDeletarTransacao()
+        carregarTransacoes()
+    }
+
+    function actionsTransacao(e) {
+        const target = e.target
+
+        const cardElement = target.closest('.t-card')
+
+        if(!cardElement) return
+
+        const transacaoId = cardElement.dataset.id
+
+        if(target.tagName === 'BUTTON') {
+            const actionType = target.dataset.action
+            if(actionType === "editar") {
+                const transacaoEncontrada = transacoesFiltradas.find(t => t.id === transacaoId) ?? null
+                console.log("Nome da transacao que será editada => " + transacaoEncontrada.descricao)
+            }
+
+            if(actionType === "deletar") {
+                idTransacaoDeletar.current = transacaoId
+                abrirModalDeletarTransacao()
+            }
+        }
     }
 
     return (
@@ -194,13 +238,13 @@ function Transacoes({setPropsInfoPopup}) {
                 <thead>
                 <tr><th>Descrição</th><th>Tipo</th><th>Categoria</th><th>Conta</th><th>Data</th><th>Valor</th><th></th></tr>
                 </thead>
-                <tbody id="txn-tbody">
+                <tbody id="txn-tbody" onClick={actionsTransacao}>
                     {isTransacoesEmpty ?
                         <tr><td colSpan="7" className="empty-row">Nenhuma transação encontrada.</td></tr>
                     :
 
                     transacoesFiltradas.map((transacao) => 
-                        <tr key={transacao.id}>
+                        <tr className="t-card" key={transacao.id} data-id={transacao.id}>
                             <td>{transacao.descricao}</td>
                             <td>
                                 <span 
@@ -221,10 +265,13 @@ function Transacoes({setPropsInfoPopup}) {
                             </td>
                             <td>
                                 <div className="txn-actions">
-                                <button className="btn-icon">✏</button>
+                                <button 
+                                className="btn-icon" 
+                                data-action="editar"
+                                >✏</button>
                                 <button 
                                 className="btn-icon danger"
-                                onClick={abrirModalDeletarTransacao}
+                                data-action="deletar"
                                 >✕</button>
                                 </div>
                             </td>
