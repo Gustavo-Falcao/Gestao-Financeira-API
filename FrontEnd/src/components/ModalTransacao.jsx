@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { data } from "react-router-dom";
 import { apiHttpMethodHandler } from "../helpers/apiFetch";
 
-function ModalTransacao({ isOpen, onClose, onCreate, setPropsInfoPopup, categorias, contas }) {
+function ModalTransacao({ isOpen, onClose, onSubmit, setPropsInfoPopup, categorias, contas, modeModal }) {
     const { apiFetch } = apiHttpMethodHandler();
     const [inputDescricao, setInputDescricao] = useState("");
     const [tipoTransacaoEscolhida, setTipoTransacaoEscolhida] = useState("")
@@ -105,7 +105,7 @@ function ModalTransacao({ isOpen, onClose, onCreate, setPropsInfoPopup, categori
                 categoriaId: categoriaEscolhida
             }
     
-            onCreate(transacaoCreateRequest)
+            onSubmit(transacaoCreateRequest)
         }
     }
 

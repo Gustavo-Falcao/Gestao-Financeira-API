@@ -90,15 +90,24 @@ function Transacoes({setPropsInfoPopup}) {
 
         setCategorias(data);
     }
+    
+    //abriModalTransacao
+    function abriModalTransacaoToEdit() {
+        setIsModalTransacaoOpen(true)
+        setIsBackGroundModalOpen(true)
+        modeModalTransacao.current = "edit"
+    }
 
+    function abriModalTransacaoToCreate() {
+        setIsModalTransacaoOpen(true)
+        setIsBackGroundModalOpen(true)
+        modeModalTransacao.current = "create"
+    }
+    
     function fecharModalTransacao() {
         setIsModalTransacaoOpen(false)
         setIsBackGroundModalOpen(false)
-    }
-
-    function abriModalTransacao() {
-        setIsModalTransacaoOpen(true)
-        setIsBackGroundModalOpen(true)
+        modeModalTransacao.current = null
     }
 
     function abrirModalDeletarTransacao() {
@@ -194,7 +203,7 @@ function Transacoes({setPropsInfoPopup}) {
                 <h2 className="page-title">Transações</h2>
                 <p className="page-sub">Registre e acompanhe suas movimentações</p>
             </div>
-            <button className="btn-primary" onClick={abriModalTransacao}>+ Nova Transação</button>
+            <button className="btn-primary" onClick={abriModalTransacaoToCreate}>+ Nova Transação</button>
             </div>
             <div className="filter-bar">
             <select 
@@ -287,7 +296,7 @@ function Transacoes({setPropsInfoPopup}) {
             <ModalTransacao 
             isOpen={isModalTransacaoOpen} 
             onClose={fecharModalTransacao} 
-            onCreate={criarTransacao} 
+            onSubmit={criarTransacao} 
             setPropsInfoPopup={setPropsInfoPopup} 
             categorias={categorias} 
             contas={contas}
