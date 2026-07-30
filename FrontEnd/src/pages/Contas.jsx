@@ -3,7 +3,6 @@ import { apiHttpMethodHandler } from "../helpers/apiFetch"
 import BackGroundModal from "../components/BackGroundModal.jsx";
 import ModalConta from "../components/ModalConta.jsx";
 import ModalDeletar from "../components/ModalDeletar.jsx";
-import ModalEditarConta from "../components/ModalEditarConta.jsx";
 
 function Contas({ setPropsInfoPopup }) {
     const { apiFetch } = apiHttpMethodHandler()
