@@ -1,20 +1,25 @@
 import { useEffect, useState } from "react"
 import { data } from "react-router-dom";
 import { apiHttpMethodHandler } from "../helpers/apiFetch";
+import { handleCurrency } from "../helpers/handleCurrency.js";
 
-function ModalTransacao({ isOpen, onClose, onSubmit, setPropsInfoPopup, categorias, contas, modeModal }) {
+function ModalTransacao({ isOpen, onClose, onSubmit, setPropsInfoPopup, categorias, contas, modeModal, transacaoEdit }) {
     const { apiFetch } = apiHttpMethodHandler();
-    const [inputDescricao, setInputDescricao] = useState("");
-    const [tipoTransacaoEscolhida, setTipoTransacaoEscolhida] = useState("")
-    const [inputValorTransacao, setInputValorTransacao] = useState("")
-    const [contaEscolhida, setContaEscolhida] = useState("")
-    const [categoriaEscolhida, setCategoriaEscolhida] = useState("")
-    const [inputData, setInputData] = useState("")
+    const { formatarDinheiroVindoApi, formatarDinheiroInput, converterMoedaBRParaNumero } = handleCurrency();
+    const [inputDescricao, setInputDescricao] = useState(transacaoEdit?.descricao ?? "");
+    const [tipoMovimentacao, setTipoMovimentacao] = useState(handleTipoMovimentacao(transacaoEdit?.tipoMovimentacao) ?? "")
+    const [inputValorTransacao, setInputValorTransacao] = useState(() => {
+        return transacaoEdit ? formatarDinheiroVindoApi(transacaoEdit?.valor) : ""
+    }
+    )
+    const [contaEscolhida, setContaEscolhida] = useState(transacaoEdit?.contaId ?? "")
+    const [categoriaEscolhida, setCategoriaEscolhida] = useState(transacaoEdit?.categoriaId ?? "")
+    const [inputData, setInputData] = useState(transacaoEdit?.data ?? "")
     const categoriasFiltradas = filtrarCategoriasByTipoTransacao()
 
     function filtrarCategoriasByTipoTransacao() {
-        const tipoTransacao = tipoTransacaoEscolhida === "1" ? 
-        "Receita" : tipoTransacaoEscolhida === "2" ?
+        const tipoTransacao = tipoMovimentacao === "1" ? 
+        "Receita" : tipoMovimentacao === "2" ?
         "Despesa" : "";
 
         return categorias.filter(categoria => {
@@ -24,24 +29,8 @@ function ModalTransacao({ isOpen, onClose, onSubmit, setPropsInfoPopup, categori
         })
     }
 
-    function formatarDinheiro(valor) {
-        const valorNumerico = Number(valor) / 100
-
-        const valorFormatado = new Intl.NumberFormat('pt-BR', {
-            style: 'currency',
-            currency: 'BRL',
-        }).format(valorNumerico)
-
-        return valorFormatado
-    }
-
-    function converterMoedaBRParaNumero(valor) {
-        return Number(valor
-            .replace("R$", "")
-            .trim()
-            .replace(/\./g, "")
-            .replace(",", ".")
-        )
+    function handleTipoMovimentacao(tipoMovimentacao) {
+        return tipoMovimentacao === "Receita" ? "1" : tipoMovimentacao === "Despesa" ? "2" : ""
     }
 
     function handleInputDinheiro(e) {
@@ -49,7 +38,7 @@ function ModalTransacao({ isOpen, onClose, onSubmit, setPropsInfoPopup, categori
 
         valorDigitado = valorDigitado.replace(/\D/g,"")
 
-        setInputValorTransacao(formatarDinheiro(valorDigitado));
+        setInputValorTransacao(formatarDinheiroInput(valorDigitado));
     }
 
     function isCamposValidos(valorNumerico) {
@@ -68,7 +57,7 @@ function ModalTransacao({ isOpen, onClose, onSubmit, setPropsInfoPopup, categori
             return false
         }
 
-        if(!tipoTransacaoEscolhida) {
+        if(!tipoMovimentacao) {
             setPropsInfoPopup({msg: "Tipo da transação é obrigatório", type: "error", isOpen: true})
             return false
         }
@@ -92,14 +81,26 @@ function ModalTransacao({ isOpen, onClose, onSubmit, setPropsInfoPopup, categori
 
     }
 
-    function handleCreate() {
+    function handleSubmit() {
+        if(modeModal === "create") {
+            submitCreate()
+        }
+        else if(modeModal === "edit") {
+            submitEdit()
+        }
+        else {
+            return
+        }
+    }
+
+    function submitCreate() {
         const valorNumerico = converterMoedaBRParaNumero(inputValorTransacao)
 
         if(isCamposValidos(valorNumerico)) {
             const transacaoCreateRequest = {
                 descricao: inputDescricao,
                 valor: valorNumerico,
-                tipoMovimentacao: Number(tipoTransacaoEscolhida),
+                tipoMovimentacao: Number(tipoMovimentacao),
                 data: inputData,
                 contaId: contaEscolhida,
                 categoriaId: categoriaEscolhida
@@ -107,6 +108,60 @@ function ModalTransacao({ isOpen, onClose, onSubmit, setPropsInfoPopup, categori
     
             onSubmit(transacaoCreateRequest)
         }
+    }
+
+    function submitEdit() {
+        let editRequest = {}
+        let changes = false
+
+        if(inputDescricao !== transacaoEdit?.descricao) {
+            editRequest = {...editRequest, descricao: inputDescricao.trim()}
+            changes = true
+        }
+
+        if(tipoMovimentacao) {
+            const tipoMovimentacaoEnum = handleTipoMovimentacao(transacaoEdit?.tipoMovimentacao)
+            if(tipoMovimentacao !== tipoMovimentacaoEnum) {
+                editRequest = {...editRequest, tipoMovimentacao: Number(tipoMovimentacao)}
+                changes = true
+            }
+        }
+
+        if(inputValorTransacao) {
+            const valorNumericoTransacao = converterMoedaBRParaNumero(inputValorTransacao)
+
+            if(valorNumericoTransacao !== transacaoEdit?.valor) {
+                editRequest = {...editRequest, valor: valorNumericoTransacao}
+                changes = true
+            }
+        }
+
+        //conta
+        if(contaEscolhida !== transacaoEdit?.contaId) {
+            editRequest = {...editRequest, contaId: contaEscolhida}
+            changes = true
+        }
+
+        //categoria
+        if(categoriaEscolhida !== transacaoEdit?.categoriaId) {
+            editRequest = {...editRequest, categoriaId: categoriaEscolhida}
+            changes = true
+        }
+
+        //data
+        if(inputData !== transacaoEdit?.data) {
+            editRequest = {...editRequest, data: inputData}
+            changes = true
+        }
+
+        if(!changes){
+            onClose()
+            console.log("Nada mudou, fechar")
+            return
+        }
+
+        console.log(editRequest)
+        onSubmit(editRequest)
     }
 
     if(!isOpen) return null
@@ -134,8 +189,8 @@ function ModalTransacao({ isOpen, onClose, onSubmit, setPropsInfoPopup, categori
                 <label>Tipo</label>
                 <select 
                 id="txn-tipo" 
-                value={tipoTransacaoEscolhida} 
-                onChange={(e) => setTipoTransacaoEscolhida(e.target.value)}
+                value={tipoMovimentacao} 
+                onChange={(e) => setTipoMovimentacao(e.target.value)}
                 >
                     <option value="">Tipo Transação</option>
                     <option value="1">Receita</option>
@@ -189,7 +244,7 @@ function ModalTransacao({ isOpen, onClose, onSubmit, setPropsInfoPopup, categori
         </div>
         <div className="modal-footer">
             <button className="btn-ghost" onClick={onClose}>Cancelar</button>
-            <button className="btn-primary" onClick={handleCreate}>Salvar</button>
+            <button className="btn-primary" onClick={handleSubmit}>Salvar</button>
         </div>
     </div>
     )

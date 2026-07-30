@@ -2,12 +2,14 @@ import { use, useEffect, useRef, useState } from "react"
 import BackGroundModal from "../components/BackGroundModal.jsx";
 import ModalTransacao from "../components/ModalTransacao.jsx";
 import { apiHttpMethodHandler } from "../helpers/apiFetch.js";
+import { handleCurrency } from "../helpers/handleCurrency.js";
 import { data } from "react-router-dom";
 import ModalDeletar from "../components/ModalDeletar.jsx";
 
 
 function Transacoes({setPropsInfoPopup}) {
     const { apiFetch } = apiHttpMethodHandler();
+    const { formatarDinheiroVindoApi } = handleCurrency();
     const [transacoes, setTransacoes] = useState([])
     const [isBackGroundModalOpen, setIsBackGroundModalOpen] = useState(false)
     const [isModalTransacaoOpen, setIsModalTransacaoOpen] = useState(false)
@@ -108,6 +110,7 @@ function Transacoes({setPropsInfoPopup}) {
         setIsModalTransacaoOpen(false)
         setIsBackGroundModalOpen(false)
         modeModalTransacao.current = null
+        transacaoSerEditada.current = null
     }
 
     function abrirModalDeletarTransacao() {
@@ -121,6 +124,15 @@ function Transacoes({setPropsInfoPopup}) {
         idTransacaoDeletar.current = null
     }
 
+    function formatarData(data) {
+        const dataSeparada = data.split("-")
+        const ano = dataSeparada[0]
+        const mes = dataSeparada[1]
+        const dia = dataSeparada[2]
+
+        return `${dia}/${mes}/${ano}`
+    }
+
     async function criarTransacao(requestCreateTransacao) {
         const response = await apiFetch("/transacoes", {
             method: "POST",
@@ -129,26 +141,55 @@ function Transacoes({setPropsInfoPopup}) {
 
         if(!response) return
 
-        setPropsInfoPopup({msg: "Transação criada com sucesso", type: "success", isOpen: true})
+        //not found
+        if(response.status === 404) {
+            const data = await response.json()
+            setPropsInfoPopup({msg: data.message, type: "error", isOpen: true})
+        }
+
+        //bad request
+        if(response.status === 400) {
+            const data = await response.json()
+            setPropsInfoPopup({msg: data.message, type: "error", isOpen: true})
+        }
+
+        if(response.status === 201) {
+            setPropsInfoPopup({msg: "Transacao criada com sucesso.", type: "success", isOpen: true})
+        }
 
         fecharModalTransacao()
         carregarTransacoes();
     }
 
-    function formatarDinheiroVindoApi(valor) {
-        return new Intl.NumberFormat("pt-BR", {
-            style: "currency",
-            currency: "BRL",
-        }).format(Number(valor));
-    }
+    async function editarTransacao(requestUpdateTransacao) {
+        const transacaoId = transacaoSerEditada.current.id
 
-    function formatarData(data) {
-        const dataSeparada = data.split("-")
-        const ano = dataSeparada[0]
-        const mes = dataSeparada[1]
-        const dia = dataSeparada[2]
+        const response = await apiFetch(`/transacoes/${transacaoId}`, {
+            method: "PATCH",
+            body: JSON.stringify(requestUpdateTransacao)
+        });
 
-        return `${dia}/${mes}/${ano}`
+        if(!response) return
+
+        //not found
+        if(response.status === 404) {
+            const data = await response.json()
+            setPropsInfoPopup({msg: data.message, type: "error", isOpen: true})
+        }
+
+        //bad request
+        if(response.status === 400) {
+            const data = await response.json()
+            setPropsInfoPopup({msg: data.message, type: "error", isOpen: true})
+        }
+
+        //ok
+        if(response.status === 200) {
+            setPropsInfoPopup({msg: "Transacao atualizada com sucesso.", type: "success", isOpen: true})
+        }
+
+        fecharModalTransacao()
+        carregarTransacoes()
     }
 
     async function deletarTransacao() {
@@ -185,7 +226,8 @@ function Transacoes({setPropsInfoPopup}) {
             const actionType = target.dataset.action
             if(actionType === "editar") {
                 const transacaoEncontrada = transacoesFiltradas.find(t => t.id === transacaoId) ?? null
-                console.log("Nome da transacao que será editada => " + transacaoEncontrada.descricao)
+                transacaoSerEditada.current = transacaoEncontrada
+                abriModalTransacaoToEdit()
             }
 
             if(actionType === "deletar") {
@@ -296,10 +338,12 @@ function Transacoes({setPropsInfoPopup}) {
             <ModalTransacao 
             isOpen={isModalTransacaoOpen} 
             onClose={fecharModalTransacao} 
-            onSubmit={criarTransacao} 
+            onSubmit={modeModalTransacao.current === "edit" ? editarTransacao : criarTransacao} 
             setPropsInfoPopup={setPropsInfoPopup} 
             categorias={categorias} 
             contas={contas}
+            modeModal={modeModalTransacao.current}
+            transacaoEdit={transacaoSerEditada.current}
             />
             <ModalDeletar 
             isOpen={isModalDeletarTransacaoOpen}

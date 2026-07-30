@@ -76,7 +76,10 @@ namespace Gestao_Financeira.Services.DashboardService
                 })
                 .ToList();
 
+            DateOnly dataCorte = DateOnly.FromDateTime(DateTime.Now).AddDays(-3);
+
             List<TransacaoResponseDto> transacoesResponseDtos = transacoes
+                .Where(t => t.Data >= dataCorte)
                 .Select(t => new TransacaoResponseDto
                 {
                     Id = t.Id,

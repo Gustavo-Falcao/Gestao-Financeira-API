@@ -62,7 +62,7 @@ namespace Gestao_Financeira.Controllers
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
                 _service.Update(request, id);
-                return Ok("Atualizado com sucesso");
+                return Ok();
             });
         }
 
@@ -73,7 +73,7 @@ namespace Gestao_Financeira.Controllers
             return ExecutarComTratamentoDeException(() =>
             {
                 _service.Delete(id);
-                return Ok("Removido com sucesso");
+                return Ok();
             });
         }
 

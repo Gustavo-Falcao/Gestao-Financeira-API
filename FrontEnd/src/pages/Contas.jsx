@@ -12,9 +12,9 @@ function Contas({ setPropsInfoPopup }) {
     const [isBackGroundModalOpen, setIsBackGroundModalOpen] = useState(false)
     const [isContaModalOpen, setIsContaModalOpen] = useState(false)
     const [isDeletarContaModalOpen, setIsDeletarContaModalOpen] = useState(false)
-    const [isEditarContaModalOpen, setIsEditarContaModalOpen] = useState(false)
     const contaSerEditada = useRef(null);
     const idContaSerDeletada = useRef(null);
+    const modeModal = useRef(null)
 
     useEffect(() => {
         carregarContas()
@@ -29,15 +29,24 @@ function Contas({ setPropsInfoPopup }) {
 
         setContas(data);
     }
-
-    function openModalConta() {
+    
+    function openModalContaToCreate() {
+        setIsBackGroundModalOpen(true)
+        setIsContaModalOpen(true)   
+        modeModal.current = "create"
+    }
+    
+    function openModalContaToEdit() {
         setIsBackGroundModalOpen(true)
         setIsContaModalOpen(true)
+        modeModal.current = "edit"
     }
-
-    function closeModalConta() {
+    
+    function fecharModalConta() {
         setIsBackGroundModalOpen(false)
         setIsContaModalOpen(false)
+        modeModal.current = null
+        contaSerEditada.current = null
     }
 
     function abrirModalDeletarConta() {
@@ -49,16 +58,6 @@ function Contas({ setPropsInfoPopup }) {
         setIsBackGroundModalOpen(false)
         setIsDeletarContaModalOpen(false)
     }
-
-    function abrirModalEditarConta() {
-        setIsBackGroundModalOpen(true)
-        setIsEditarContaModalOpen(true)
-    }
-
-    function fecharModalEditarConta() {
-        setIsBackGroundModalOpen(false)
-        setIsEditarContaModalOpen(false)
-    }
     
 
     async function excluirConta() {
@@ -67,39 +66,69 @@ function Contas({ setPropsInfoPopup }) {
             method: "DELETE"
         })
 
-        setPropsInfoPopup({msg: "Conta deletada com sucesso", type: "success", isOpen: true})
+        if(response.status === 400) {
+            const data = await response.json()
+            setPropsInfoPopup({msg: data.message, type: "error", isOpen: true})
+        }
+
+        if(response.status === 404) {
+            const data = await response.json()
+            setPropsInfoPopup({msg: data.message, type: "error", isOpen: true})
+        }
+
+        if(response.status === 200) {
+            setPropsInfoPopup({msg: "Conta excluida com sucesso!", type: "success", isOpen: true})
+        }
 
         fecharModalDeletarConta()
         carregarContas()
     }
 
     async function criarConta(requestCreateConta) {
+        console.log("conta sera criada")
         const response = await apiFetch("/contas", {
             method: "POST",
             body: JSON.stringify(requestCreateConta)
         });
 
         if(!response) return
+        
+        if(response.status === 400) {
+            const data = await response.json()
+            setPropsInfoPopup({msg: data.message, type: "error", isOpen: true})
+        }
 
-        setPropsInfoPopup({msg: "Conta criada com sucesso", type: "success", isOpen: true})
+        if(response.status === 201) {
+            setPropsInfoPopup({msg: "Conta criada com sucesso!", type: "success", isOpen: true})
+        }
 
-        closeModalConta()
+        fecharModalConta()
         carregarContas()
     }
 
     async function editarConta(requestEditConta) {
         const contaId = contaSerEditada.current.id
         const response = await apiFetch(`/contas/${contaId}`, {
-            method: "PUT",
+            method: "PATCH",
             body: JSON.stringify(requestEditConta)
         });
 
         if(!response) return
 
-        setPropsInfoPopup({msg: "Conta alterada com sucesso", type: "success", isOpen: true})
+        if(response.status === 400) {
+            const data = await response.json()
+            setPropsInfoPopup({msg: data.message, type: "error", isOpen: true})
+        }
 
-        contaSerEditada.current = {id: "", nome: "", saldoInicial: "", tipoConta: ""}
-        fecharModalEditarConta()
+        if(response.status === 404) {
+            setPropsInfoPopup({msg: "Conta não encontrada!", type: "error", isOpen: true})
+        }
+
+        if(response.status === 200) {
+            setPropsInfoPopup({msg: "Conta editada com sucesso!", type: "success", isOpen: true})
+        }
+
+        fecharModalConta()
         carregarContas()
     }
 
@@ -117,7 +146,7 @@ function Contas({ setPropsInfoPopup }) {
             if(actionType === "editar") {
                 const contaEncontrada = contas.find(c => c.id === contaId) ?? null
                 contaSerEditada.current = contaEncontrada
-                abrirModalEditarConta()
+                openModalContaToEdit()
             } 
             
             if(actionType === "deletar") {
@@ -143,7 +172,7 @@ function Contas({ setPropsInfoPopup }) {
                 <h2 className="page-title">Contas</h2>
                 <p className="page-sub">Gerencie suas contas bancárias e carteiras</p>
             </div>
-            <button className="btn-primary" onClick={openModalConta}>+ Nova Conta</button>
+            <button className="btn-primary" onClick={openModalContaToCreate}>+ Nova Conta</button>
             </div>
             <div className="cards-grid" id="contas-grid" onClick={actionsConta}>
                 {isContasEmpty ?
@@ -200,9 +229,11 @@ function Contas({ setPropsInfoPopup }) {
       <BackGroundModal isOpen={isBackGroundModalOpen}>
         <ModalConta
         isOpen={isContaModalOpen} 
-        onClose={closeModalConta} 
+        onClose={fecharModalConta} 
         setPropsInfoPopup={setPropsInfoPopup}
-        onCreate={criarConta}
+        onSubmit={modeModal.current === "edit" ? editarConta : criarConta}
+        modeModal={modeModal.current}
+        contaEdit={contaSerEditada.current}
         />
 
         <ModalDeletar 
@@ -210,13 +241,6 @@ function Contas({ setPropsInfoPopup }) {
         onCancelar={fecharModalDeletarConta} 
         onExcluir={excluirConta}
         nomeDeletar={"conta"}
-        />
-
-        <ModalEditarConta 
-        isOpen={isEditarContaModalOpen} 
-        contaEditar={contaSerEditada.current}
-        onClose={fecharModalEditarConta} 
-        onSave={editarConta}
         />
       </BackGroundModal>
       </>

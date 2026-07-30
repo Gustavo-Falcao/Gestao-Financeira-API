@@ -132,7 +132,7 @@ namespace Gestao_Financeira.Services.ContaService
 
             if(request.TipoConta.HasValue)
             {
-                if(!Enum.IsDefined(typeof(TipoConta), request.TipoConta.Value))
+                if(!Enum.IsDefined<TipoConta>(request.TipoConta.Value))
                     throw new ValidationException("Tipo de conta inválido");
 
                 conta.AlterarTipoConta(request.TipoConta.Value);

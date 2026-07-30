@@ -66,7 +66,7 @@ namespace Gestao_Financeira.Controllers
                     return Unauthorized();
 
                 _service.Update(request, id, userId);
-                return Ok("Atualizado com sucesso");
+                return Ok();
             });            
         }
 
@@ -77,7 +77,7 @@ namespace Gestao_Financeira.Controllers
             return ExecutarComTratamentoDeException(() =>
             {
                 _service.Delete(id);
-                return Ok("Removido com sucesso");
+                return Ok();
             });
         }
 

@@ -87,7 +87,7 @@ namespace Gestao_Financeira.Services.TransacaoService
                 throw new ValidationException("Valor deve ser maior que zero");
 
             if(!Enum.IsDefined(typeof(TipoMovimentacao), request.TipoMovimentacao))
-                throw new ValidationException("Tipode movimentação inválido");
+                throw new ValidationException("Tipo de movimentação inválido");
 
             if(request.Data > DateOnly.FromDateTime(DateTime.Today))
                 throw new ValidationException("A data da transação não poder ser futura.");
@@ -164,6 +164,59 @@ namespace Gestao_Financeira.Services.TransacaoService
                 t.AlterarValor(request.Valor.Value);
             }
 
+            if(request.TipoMovimentacao.HasValue && request.CategoriaId is not null)
+            {
+                if(!Enum.IsDefined<TipoMovimentacao>(request.TipoMovimentacao.Value))
+                    throw new ValidationException("Tipo de movimentação inválido");
+                
+                var categoriaId = request.CategoriaId.Trim();
+
+                if(string.IsNullOrWhiteSpace(categoriaId))
+                {
+                    throw new ValidationException("O id da categoria não pode ser vazio.");
+                }
+
+                var categoria = _categoriaRepository.GetById(categoriaId) ?? throw new NotFoundException("Categoria não encontrada.");
+
+                if(categoria.UsuarioId != userId)
+                    throw new NotFoundException("Categoria não encontrada.");
+
+                if(categoria.TipoMovimentacao != request.TipoMovimentacao.Value)
+                    throw new ValidationException("Tipo movimentação ou categoria inválido.");
+
+                t.AlterarCategoriaId(categoriaId);
+                t.AlterarTipoMovimentacao(request.TipoMovimentacao.Value);
+            }
+            else if(request.TipoMovimentacao.HasValue)
+            {
+                if(!Enum.IsDefined<TipoMovimentacao>(request.TipoMovimentacao.Value))
+                    throw new ValidationException("Tipo de movimentação inválido");
+
+                var categoria = _categoriaRepository.GetById(t.CategoriaId) ?? throw new NotFoundException("Categoria não encontrada.");
+
+                if(categoria.TipoMovimentacao != request.TipoMovimentacao.Value)
+                    throw new ValidationException("Tipo de movimentação inválido");
+            }
+            else if(request.CategoriaId is not null)
+            {
+                var categoriaId = request.CategoriaId.Trim();
+
+                if(string.IsNullOrWhiteSpace(categoriaId))
+                {
+                    throw new ValidationException("O id da categoria não pode ser vazio.");
+                }
+
+                var categoria = _categoriaRepository.GetById(categoriaId) ?? throw new NotFoundException("Categoria não encontrada.");
+
+                if(categoria.UsuarioId != userId)
+                    throw new NotFoundException("Categoria não encontrada.");
+
+                if(categoria.TipoMovimentacao != t.TipoMovimentacao)
+                    throw new ValidationException("Categoria escolhida não corresponde ao tipo da transação.");
+
+                t.AlterarCategoriaId(categoriaId);    
+            }
+
             if(request.Data.HasValue)
             {
                 if(request.Data.Value > DateOnly.FromDateTime(DateTime.Today))
@@ -189,25 +242,6 @@ namespace Gestao_Financeira.Services.TransacaoService
                 t.AlterarContaId(idConta);
             }
 
-            if(request.CategoriaId is not null)
-            {
-                var categoriaId = request.CategoriaId.Trim();
-
-                if(string.IsNullOrWhiteSpace(categoriaId))
-                {
-                    throw new ValidationException("O id da categoria não pode ser vazio.");
-                }
-
-                var categoria = _categoriaRepository.GetById(categoriaId) ?? throw new NotFoundException("Categoria não encontrada.");
-
-                if(categoria.UsuarioId != userId)
-                    throw new NotFoundException("Categoria não encontrada.");
-
-                if(categoria.TipoMovimentacao != t.TipoMovimentacao)
-                    throw new ValidationException("Categoria escolhida não corresponde ao tipo da transação.");
-
-                t.AlterarCategoriaId(categoriaId);
-            }
 
             _transacaoRepository.Save();
         }

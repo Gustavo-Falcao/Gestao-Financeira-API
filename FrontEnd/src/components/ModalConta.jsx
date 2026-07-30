@@ -1,30 +1,18 @@
 import { use, useState } from "react"
+import { handleCurrency } from "../helpers/handleCurrency.js";
 
-function ModalConta({ isOpen, onClose, setPropsInfoPopup, onCreate }) {
-    const [nomeContaInput, setNomeContaInput] = useState("")
-    const [saldoIncialInput, setSaldoIncialInput] = useState("")
-    const [tipoContaEscolhido, setTipoContaEscolhido] = useState("1")
+function ModalConta({ isOpen, onClose, setPropsInfoPopup, onSubmit, modeModal, contaEdit }) {
+    const { formatarDinheiroVindoApi, formatarDinheiroInput, converterMoedaBRParaNumero } = handleCurrency();
+    const [nomeContaInput, setNomeContaInput] = useState(contaEdit?.nome ?? "")
+    const [saldoIncialInput, setSaldoIncialInput] = useState(() => {
+        return contaEdit ? formatarDinheiroVindoApi(contaEdit?.saldoInicial) : ""
+    })
+    const [tipoContaEscolhido, setTipoContaEscolhido] = useState(contaEdit?.tipoConta ?? "")
 
     if(!isOpen) return null
 
-    function formatarDinheiro(valor) {
-        const valorNumerico = Number(valor) / 100
-
-        const valorFormatado = new Intl.NumberFormat('pt-BR', {
-            style: 'currency',
-            currency: 'BRL',
-        }).format(valorNumerico)
-
-        return valorFormatado
-    }
-
-    function converterMoedaBRParaNumero(valor) {
-        return Number(valor
-            .replace("R$", "")
-            .trim()
-            .replace(/\./g, "")
-            .replace(",", ".")
-        )
+    function handleEnumTipoConta(tipoConta) {
+        return tipoConta === "Corrente" ? "1" : tipoConta === "Poupanca" ? "2" : tipoConta === "Carteira" ? "3" : ""
     }
 
     function handleInputDinheiro(e) {
@@ -32,50 +20,98 @@ function ModalConta({ isOpen, onClose, setPropsInfoPopup, onCreate }) {
 
         valorDigitado = valorDigitado.replace(/\D/g,"")
 
-        setSaldoIncialInput(formatarDinheiro(valorDigitado));
+        setSaldoIncialInput(formatarDinheiroInput(valorDigitado));
     }
 
     function validarCampos(valorSerSalvo) {
         if(!nomeContaInput) {
             setPropsInfoPopup({msg: "Nome da conta é obrigatório.", type: "error", isOpen: true})
-            return
+            return false
         }
 
         if(nomeContaInput.length < 2) {
             setPropsInfoPopup({msg: "Nome da conta deve ter pelo menos 2 letras.", type: "error", isOpen: true})
-            return
+            return false
         }
 
         if(nomeContaInput.length > 50) {
             setPropsInfoPopup({msg: "Nome da conta deve ter no máximo 50 letras.", type: "error", isOpen: true})
-            return
+            return false
         }
 
         if(!saldoIncialInput) {
             setPropsInfoPopup({msg: "Saldo inicial é obrigatório.", type: "error", isOpen: true})
-            return
+            return false
         }
         
         valorSerSalvo = converterMoedaBRParaNumero(saldoIncialInput);
 
         if(valorSerSalvo < 0) {
             setPropsInfoPopup({msg: "Saldo inicial não pode ser negativo", type: "error", isOpen: true})
-            return
+            return false
         }
 
+        return true
     }
 
-    function handleCriarConta() {
+    function handleSubmit() {
+        if(modeModal === "edit") {
+            submitEdit()
+        }
+        else if(modeModal === "create") {
+            submitCreate()
+        }
+        else {
+            return
+        }
+    }
+
+    function submitCreate() {
         const valorSerSalvo = converterMoedaBRParaNumero(saldoIncialInput);
-        validarCampos(valorSerSalvo)
+        if(!validarCampos(valorSerSalvo)) return
+
+        const enumTipoConta = handleEnumTipoConta(tipoContaEscolhido)
 
         const requestCreateConta = {
             nome: nomeContaInput,
-            tipoConta: Number(tipoContaEscolhido),
+            tipoConta: Number(enumTipoConta),
             saldoInicial: valorSerSalvo
         } 
 
-        onCreate(requestCreateConta)
+        onSubmit(requestCreateConta)
+    }
+
+    function submitEdit() {
+        let editRequest = {}
+        let changes = false
+
+        if(nomeContaInput !== contaEdit?.nome) {
+            editRequest = {...editRequest, nome: nomeContaInput}
+            changes = true
+        }
+
+        if(saldoIncialInput) {
+            const valorNumericoSaldoInicial = converterMoedaBRParaNumero(saldoIncialInput)
+
+            if(valorNumericoSaldoInicial != contaEdit?.saldoInicial) {
+                editRequest = {...editRequest, saldoInicial: valorNumericoSaldoInicial}
+                changes = true
+            }
+        }
+
+        if(tipoContaEscolhido !== contaEdit?.tipoConta) {
+            const tipoContaEnum = handleEnumTipoConta(tipoContaEscolhido)
+            editRequest = {...editRequest, tipoConta: Number(tipoContaEnum)}
+            changes = true
+        }
+
+        if(changes) {
+            onSubmit(editRequest)
+        }
+        else {
+            onClose()
+        }
+
     }
 
     return(
@@ -102,9 +138,10 @@ function ModalConta({ isOpen, onClose, setPropsInfoPopup, onCreate }) {
                         value={tipoContaEscolhido}
                         onChange={(e) => setTipoContaEscolhido(e.target.value)}
                         >
-                            <option value="1">Conta Corrente</option>
-                            <option value="2">Poupança</option>
-                            <option value="3">Carteira</option>
+                            <option value="">Tipo</option>
+                            <option value="Corrente">Corrente</option>
+                            <option value="Poupanca">Poupança</option>
+                            <option value="Carteira">Carteira</option>
                         </select>
                     </div>
                     <div className="form-group">
@@ -123,7 +160,7 @@ function ModalConta({ isOpen, onClose, setPropsInfoPopup, onCreate }) {
                     className="btn-ghost"
                     onClick={onClose}
                     >Cancelar</button>
-                    <button className="btn-primary" onClick={handleCriarConta} >Salvar</button>
+                    <button className="btn-primary" onClick={handleSubmit} >Salvar</button>
                 </div>
             </div>
 
