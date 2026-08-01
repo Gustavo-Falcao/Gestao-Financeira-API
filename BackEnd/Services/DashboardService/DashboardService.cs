@@ -8,6 +8,7 @@ using Gestao_Financeira.Repositories.CategoriaRepository;
 using Gestao_Financeira.Repositories.ContaRepository;
 using Gestao_Financeira.Repositories.TransacaoRepository;
 using Gestao_Financeira.Repositories.UserRepository;
+using Gestao_Financeira.Services.UserService;
 
 namespace Gestao_Financeira.Services.DashboardService
 {
@@ -113,6 +114,30 @@ namespace Gestao_Financeira.Services.DashboardService
                 Contas = contasResponseDtos,
                 Categorias = categoriasResponseDtos,
                 Transacoes = transacoesResponseDtos
+            };
+        }
+
+        public AdminDashboard GetDashboardByAdmin(string id)
+        {
+            List<UserResponseDto> users = _userRepository
+            .GetAll()
+            .Select(u => new UserResponseDto
+            {
+                Id = u.Id,
+                Nome = u.Nome,
+                Email = u.Email,
+                UserRole = u.UserRole
+            })
+            .ToList();
+
+            var quantUsers = users.Count;
+            var quantAdmin = users.Count(u => u.UserRole == UserRole.ADMIN);
+
+            return new AdminDashboard
+            {
+                QuantUsers = quantUsers,
+                QuantAdmin = quantAdmin,
+                Users = users
             };
         }
     }   

@@ -1,3 +1,4 @@
+using System.Runtime.Serialization;
 using Gestao_Financeira.Exceptions;
 using Gestao_Financeira.Models.Dtos.UserDTOs;
 using Gestao_Financeira.Models.Entities;
@@ -76,17 +77,40 @@ namespace Gestao_Financeira.Services.UserService
         {
             User user = GetByIdOrElseThrowNotFoundException(id);
             
-            if(!string.IsNullOrWhiteSpace(userUpdateRequest.Email))
+            if(userUpdateRequest.Nome is not null)
             {
-                EmailJaExisteEmUser(userUpdateRequest.Email, id);
-                user.AlterarEmail(userUpdateRequest.Email);
+                var nome = userUpdateRequest.Nome.Trim();
+
+                if(string.IsNullOrWhiteSpace(nome))
+                    throw new ValidationException("Nome não pode estar vazio");
+
+                if(nome.Length < 2 || nome.Length > 100)
+                {
+                    throw new ValidationException("Nome deve ter entre 2 e 100 caracteres");
+                }
+                
+                user.AlterarNome(nome);
             }
 
-            if(!string.IsNullOrWhiteSpace(userUpdateRequest.Nome))
-                user.AlterarNome(userUpdateRequest.Nome);
-            
-            if(!string.IsNullOrWhiteSpace(userUpdateRequest.Senha))
+            if(userUpdateRequest.Email is not null)
             {
+                var email = userUpdateRequest.Email.Trim();
+
+                if(string.IsNullOrWhiteSpace(email))
+                    throw new ValidationException("Email não pode estar vazio");
+
+                EmailJaExisteEmUser(email, id);
+
+                user.AlterarEmail(email);
+            }
+
+            if(userUpdateRequest.Senha is not null)
+            {
+                var senha = userUpdateRequest.Senha.Trim();
+
+                if(string.IsNullOrWhiteSpace(senha))
+                    throw new ValidationException("Senha não pode estar vazio");
+                
                 var novaSenhaHash = BCrypt.Net.BCrypt.HashPassword(userUpdateRequest.Senha);
                 user.AlterarSenhaHash(novaSenhaHash);
             }

@@ -1,4 +1,6 @@
+using System.Security.Claims;
 using Gestao_Financeira.Exceptions;
+using Gestao_Financeira.Services.DashboardService;
 using Gestao_Financeira.Services.UserService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,10 +12,12 @@ namespace Gestao_Financeira.Controllers.Admin
     public class AdminUserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IDashboardService _dashboardService;
 
-        public AdminUserController(IUserService userService)
+        public AdminUserController(IUserService userService, IDashboardService dashboardService)
         {
             _userService = userService;
+            _dashboardService = dashboardService;
         }
 
         [Authorize(Roles = "ADMIN")]
@@ -23,6 +27,21 @@ namespace Gestao_Financeira.Controllers.Admin
             return ExecutarComTratamentoDeException(() =>
             {
                 return Ok(_userService.GetAll());
+            });
+        }
+
+        [Authorize(Roles = "ADMIN")]
+        [HttpGet("dashboard")]
+        public IActionResult GetDashboard()
+        {
+            return ExecutarComTratamentoDeException(() =>
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if(string.IsNullOrWhiteSpace(userId))
+                    return Unauthorized();
+
+                return Ok(_dashboardService.GetDashboardByAdmin(userId));
             });
         }
 

@@ -5,5 +5,6 @@ namespace Gestao_Financeira.Services.DashboardService
     public interface IDashboardService
     {
         UserDashboardDto GetDashboardByUserId(string id);
+        AdminDashboard GetDashboardByAdmin(string id);
     }
 }

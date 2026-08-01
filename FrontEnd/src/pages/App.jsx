@@ -9,6 +9,7 @@ import Categorias from './Categorias'
 import Cadastro from './Cadastro'
 import InfoPopup from "../components/InfoPopup.jsx";
 import SideBar from '../components/SideBar.jsx'
+import Administracao from './Administracao.jsx'
 
 function App() {
   const [propsInfoPopup, setPropsInfoPopup] = useState({
@@ -29,6 +30,7 @@ function App() {
         <Route path='/contas' element={<Contas setPropsInfoPopup={setPropsInfoPopup}/>}/>
         <Route path='/transacoes' element={<Transacoes setPropsInfoPopup={setPropsInfoPopup} />}/>
         <Route path='/categorias' element={<Categorias setPropsInfoPopup={setPropsInfoPopup}/>}/>
+        <Route path='/administracao' element={<Administracao setPropsInfoPopup={setPropsInfoPopup}/>}/>
       </Route>
     </Routes>
 

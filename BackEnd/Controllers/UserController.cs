@@ -30,12 +30,12 @@ namespace Gestao_Financeira.Controllers
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
                 if(string.IsNullOrWhiteSpace(userId))
-                    return Unauthorized("Id do usuário não encontrado no token.");
+                    return Unauthorized();
 
                 var userSimpleInformation = _userService.GetUserProfileById(userId);
             
                 if(userSimpleInformation == null)
-                    return NotFound("Perfil não encontrado para o usuário autenticado.");
+                    return NotFound();
 
                 return Ok(userSimpleInformation);
             });
@@ -50,13 +50,13 @@ namespace Gestao_Financeira.Controllers
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
                 if(string.IsNullOrWhiteSpace(userId))
-                    return Unauthorized("Id do usuário não encontrado no token.");
+                    return Unauthorized();
 
                 var userDashBoard = _dashboardService.GetDashboardByUserId(userId);
 
                 if(userDashBoard is null)
                 {
-                    return NotFound("Dashboard não encontrado para o usuário autenticado.");
+                    return NotFound();
                 }
 
                 return Ok(userDashBoard);
@@ -82,10 +82,11 @@ namespace Gestao_Financeira.Controllers
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
                 if(string.IsNullOrWhiteSpace(userId))
-                    return Unauthorized("Id do usuário não encontrado no token.");
+                    return Unauthorized();
 
                 _userService.Update(userUpdateRequest, userId);
-                return Ok("Atualizado com sucesso"); 
+                
+                return Ok(); 
             });
         }
 
