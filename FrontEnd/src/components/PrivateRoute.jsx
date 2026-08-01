@@ -17,7 +17,7 @@ function PrivateRoute() {
         carregarUsuario()
     }, [])
 
-    async function carregarUsuario(params) {
+    async function carregarUsuario() {
         const response = await apiFetch("/users/me")
 
         if(!response) return;
@@ -32,7 +32,7 @@ function PrivateRoute() {
         <div className="app-shell active">
             <SideBar userProfile={userProfileData} isLoading={isLoading}/>
             <main className='main-content'>
-                <Outlet context={{ userProfileData }}/>
+                <Outlet context={{ userProfileData, isLoading}}/>
             </main>
         </div>
     )
